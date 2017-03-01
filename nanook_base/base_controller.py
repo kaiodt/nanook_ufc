@@ -52,7 +52,7 @@ class BaseController(object):
 
         ### Inicialização do nó ###
 
-        rospy.init_node('base_controller', log_level = rospy.DEBUG)
+        rospy.init_node('base_controller')
 
         ### Definição dos parâmetros ###
 
@@ -143,9 +143,9 @@ class BaseController(object):
         self.new_v_ref = reference.linear.x         # Velocidade linear em x [m/s]
         self.new_w_ref = reference.angular.z        # Velocidade angular em z [rad/s]
 
-        rospy.logdebug('* Novas referências recebidas:')
-        rospy.logdebug('- v =  %f m/s', self.new_v_ref)
-        rospy.logdebug('- w =  %f rad/s', self.new_w_ref)
+        print('* Novas referências recebidas:')
+        print('- v =  %f m/s', self.new_v_ref)
+        print('- w =  %f rad/s', self.new_w_ref)
 
     #######################################################################################
 
@@ -207,7 +207,7 @@ class BaseController(object):
 
             t_iter = rospy.get_time()
 
-            rospy.logdebug('*** Nova Iteração ***')
+            print('*** Nova Iteração ***')
 
             # Atualização das velocidades de referência
 
@@ -231,14 +231,14 @@ class BaseController(object):
             self.dt_readings = rospy.get_time() - self.last_time
             self.last_time = rospy.get_time()
 
-            rospy.logdebug('* Intervalo entre Leituras: %.5f s', self.dt_readings)
+            print('* Intervalo entre Leituras: %.5f s', self.dt_readings)
 
-            rospy.logdebug('* Odometria:')
-            rospy.logdebug('- x = %.5f m', self.x)
-            rospy.logdebug('- y = %.5f m', self.y)
-            rospy.logdebug('- 0 = %.5f graus', (self.theta * 180 / pi))
-            rospy.logdebug('- v = %.5f m/s', self.v)
-            rospy.logdebug('- w = %.5f rad/s', self.w)
+            print('* Odometria:')
+            print('- x = %.5f m', self.x)
+            print('- y = %.5f m', self.y)
+            print('- 0 = %.5f graus', (self.theta * 180 / pi))
+            print('- v = %.5f m/s', self.v)
+            print('- w = %.5f rad/s', self.w)
 
             # Publicação da odometria
 
@@ -248,7 +248,7 @@ class BaseController(object):
 
             dt_iter = rospy.get_time() - t_iter
 
-            rospy.logdebug('* Duração da Iteração: %.5f s\n', dt_iter)
+            print('* Duração da Iteração: %.5f s\n', dt_iter)
 
             # Aguardar o tempo restante para completar o período de amostragem
 
