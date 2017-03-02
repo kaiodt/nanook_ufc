@@ -54,7 +54,7 @@ class FixedTransformations(object):
         self.laser_y = rospy.get_param('~laser_y', 0.0)     # [m]
         self.laser_z = rospy.get_param('~laser_z', 0.4)     # [m]
 
-        # Nomenclatura dos frames
+        # Nomenclatura dos sistemas de coordenadas
 
         self.base_frame_id = rospy.get_param('~base_frame_id', 'base_link')
         self.laser_frame_id = rospy.get_param('~laser_frame_id', 'laser_scanner')
