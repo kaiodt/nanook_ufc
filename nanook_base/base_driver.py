@@ -7,7 +7,7 @@
 ## Email: kaiodtr@gmail.com
 ###########################################################################################
 ## Arquivo: Driver de Controle e Comunicação com a Base (FRDM K64F)
-## Revisão: 1 [26/02/2017]
+## Revisão: 2 [03/03/2017]
 ###########################################################################################
 ###########################################################################################
 
@@ -104,6 +104,35 @@ class NanookBase(object):
 
     #######################################################################################
 
+    def set_pose(self, x, y, theta):
+
+        """Definição de pose.
+
+        Argumentos:
+            x (float): Posição no eixo x [m]
+            y (float): Posição no eixo y [m]
+            theta (float): Orientação [rad]
+
+        """
+
+        # Preparação da string a ser enviada para a base
+        # Formato: p [sig][x1][x2][x3].[x4][x5][x6]
+        #            [sig][y1][y2][y3].[y4][y5][y6]
+        #            [sig][t1].[t2][t3][t4][t5][t6]
+        # Nota: Os pontos decimais não são enviados.
+
+        ref_str = 'p{:=+07.0f}{:=+07.0f}{:=+07.0f}'.format(x * 1e3, y * 1e3, theta * 1e5)
+
+        # Envio da string com a pose, um caractere por vez
+
+        for char in ref_str:
+            self.serial_base.write(char)
+
+
+    #######################################################################################
+
+    #######################################################################################
+
     def get_odometry(self):
 
         """Informações de odometria da base em relação ao referencial fixo.
@@ -122,7 +151,7 @@ class NanookBase(object):
         self.serial_base.write('o')
 
         # Recebimento dos 29 bytes contendo os dados de odometria
-    
+
         odometry_str = self.serial_base.read(29)
 
         # Extração dos valores numéricos dos dados de odometria a partir da string recebida
@@ -210,9 +239,10 @@ class NanookBase(object):
 
         """Reinicialização da base (parada dos motores e reinicialização de odometria)."""
 
-        self.serial_base.write('r')     
+        self.serial_base.write('r')
         print("[INFO] Reiniciando a base...")
-        time.sleep(0.5)
+
+        time.sleep(1)
 
     #######################################################################################
 

@@ -8,7 +8,7 @@
 ## Email: kaiodtr@gmail.com
 ###########################################################################################
 ## Arquivo: Nó Controlador de Base
-## Revisão: 1 [26/02/2017]
+## Revisão: 2 [03/03/2017]
 ###########################################################################################
 ###########################################################################################
 
@@ -75,7 +75,7 @@ class BaseController(object):
 
         x_0 = rospy.get_param('~x_0', 0.0)          # [m]
         y_0 = rospy.get_param('~y_0', 0.0)          # [m]
-        theta_0 = rospy.get_param('~theta_0', 0.0)  # [rad]
+        theta_0 = rospy.get_param('~theta_0', pi/2)  # [rad]
 
         # Nomenclatura dos sistemas de coordenadas
 
@@ -84,9 +84,19 @@ class BaseController(object):
 
         ### Conexão com o driver controlador da base (FRDM K64F) ###
 
+        # Instanciação 
+
         self.base = NanookBase(self.base_serial_port, self.base_baud_rate)
+
+        # Conexão
+
         self.base.connect()
+
+        # Inicialização
+
         self.base.reset_base()
+        self.base.set_pose(x_0, y_0, theta_0)
+        rospy.sleep(0.5)
 
         ### Publishers ###
 
@@ -144,8 +154,8 @@ class BaseController(object):
         self.new_w_ref = reference.angular.z        # Velocidade angular em z [rad/s]
 
         print('* Novas referências recebidas:')
-        print('- v =  %f m/s', self.new_v_ref)
-        print('- w =  %f rad/s', self.new_w_ref)
+        print('- v =  %f m/s' % self.new_v_ref)
+        print('- w =  %f rad/s' % self.new_w_ref)
 
     #######################################################################################
 
@@ -164,7 +174,7 @@ class BaseController(object):
         v_x = self.v * cos(self.theta)  # [m/s]
         v_y = self.v * sin(self.theta)  # [m/s]
 
-        # Publicação em 'odom'
+        # Publicação em "odom"
 
         odom = Odometry()
         odom.header.stamp = rospy.Time.from_sec(self.last_time)
@@ -180,7 +190,7 @@ class BaseController(object):
 
         self.odom_pub.publish(odom)
 
-        # Publicação em 'tf' via broadcaster
+        # Publicação em "tf" via broadcaster
 
         self.odom_broad.sendTransform((self.x, self.y, 0),
                                       orient_quaternion,
@@ -231,14 +241,14 @@ class BaseController(object):
             self.dt_readings = rospy.get_time() - self.last_time
             self.last_time = rospy.get_time()
 
-            print('* Intervalo entre Leituras: %.5f s', self.dt_readings)
+            print('* Intervalo entre Leituras: %.5f s' % self.dt_readings)
 
             print('* Odometria:')
-            print('- x = %.5f m', self.x)
-            print('- y = %.5f m', self.y)
-            print('- 0 = %.5f graus', (self.theta * 180 / pi))
-            print('- v = %.5f m/s', self.v)
-            print('- w = %.5f rad/s', self.w)
+            print('- x = %.5f m' % self.x)
+            print('- y = %.5f m' % self.y)
+            print('- 0 = %.5f graus' % (self.theta * 180 / pi))
+            print('- v = %.5f m/s' % self.v)
+            print('- w = %.5f rad/s' % self.w)
 
             # Publicação da odometria
 
@@ -248,7 +258,8 @@ class BaseController(object):
 
             dt_iter = rospy.get_time() - t_iter
 
-            print('* Duração da Iteração: %.5f s\n', dt_iter)
+            print('* Duração da Iteração: %.5f s' % dt_iter)
+            print
 
             # Aguardar o tempo restante para completar o período de amostragem
 
