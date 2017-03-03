@@ -31,7 +31,7 @@
 		<!-- Pose inicial -->
 		<param name="x_0" type="double" value="0.0" />
 		<param name="y_0" type="double" value="0.0" />
-		<param name="theta_0" type="double" value="0.0" />
+		<param name="theta_0" type="double" value="1.570796" />
 
 		<!-- Nomenclatura dos sistemas de coordenadas -->
 		<param name="base_frame_id" type="string" value="base_link" />

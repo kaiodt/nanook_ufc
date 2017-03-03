@@ -75,7 +75,7 @@ class BaseController(object):
 
         x_0 = rospy.get_param('~x_0', 0.0)          # [m]
         y_0 = rospy.get_param('~y_0', 0.0)          # [m]
-        theta_0 = rospy.get_param('~theta_0', pi/2)  # [rad]
+        theta_0 = rospy.get_param('~theta_0', 0.0)  # [rad]
 
         # Nomenclatura dos sistemas de coordenadas
 
