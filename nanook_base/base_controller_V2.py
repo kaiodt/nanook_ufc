@@ -106,8 +106,8 @@ class BaseController(object):
 
         # Velocidades
 
-        self.left_vel_pub = rospy.Publisher('left_vel', Float32, queue_size = 10)
         self.right_vel_pub = rospy.Publisher('right_vel', Float32, queue_size = 10)
+        self.left_vel_pub = rospy.Publisher('left_vel', Float32, queue_size = 10)
 
         # Transformação base_link -> odom
 
@@ -209,24 +209,24 @@ class BaseController(object):
 
     def publish_velocities(self):
 
-        """Publicação das velocidades individuais nos tópicos 'left_vel' e 'right_vel'."""
+        """Publicação das velocidades individuais nos tópicos 'right_vel' e 'left_vel'."""
 
 
         # Conversão de velocidades linear [m/s] e angular [rad/s] da base para velocidades 
         # individuais [m/s]
 
-        left_vel  = 1.0 * self.v - self.wheel_separation * self.w / 2.0
         right_vel = 1.0 * self.v + wheel_separation * self.w / 2.0
+        left_vel  = 1.0 * self.v - self.wheel_separation * self.w / 2.0
 
         # Transformação das velocidades para [RPM]
 
-        left_vel  *= 60.0 / (pi * self.wheel_diameter)
         right_vel *= 60.0 / (pi * self.wheel_diameter)
+        left_vel  *= 60.0 / (pi * self.wheel_diameter)
 
         # Publicação das velocidades
 
-        self.left_vel_pub.publish(left_vel)
         self.right_vel_pub.publish(right_vel)
+        self.left_vel_pub.publish(left_vel)
 
     #######################################################################################
 

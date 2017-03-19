@@ -46,11 +46,11 @@ left_vel = []       # Velocidade esquerda [RPM]
 ### LEITURA DO ARQUIVO
 ###########################################################################################
 
-# Exibição das linhas com informações e armazenamento de linhas com dados (iniciadas com #)
+# Exibição das linhas com informações e armazenamento de linhas com dados (iniciadas com *)
 # nas respectivas listas
 
 for line in data_file:
-    if '#' not in line:                     # Linha com informações do ensaio
+    if '*' not in line:                     # Linha com informações do ensaio
         print line
     else:                                   # Linha com dados
         line = line.split()

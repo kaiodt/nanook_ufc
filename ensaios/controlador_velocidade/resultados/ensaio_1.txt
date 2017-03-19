@@ -1,0 +1,10 @@
+### Ensaio dos Controladores de Velocidade dos Motores ###
+
+# Parâmetros #
+
+# Número do Ensaio: 1
+# Frequência de Amostragem: 50.0 Hz
+# Número de Amostras: 1
+# Velocidade de Referência Direita: 1.000 
+# Velocidade de Referência Esquerda: 1.000 
+

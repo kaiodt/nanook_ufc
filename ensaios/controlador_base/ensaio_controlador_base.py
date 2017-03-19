@@ -8,8 +8,23 @@
 ## Email: kaiodtr@gmail.com
 ###########################################################################################
 ## Arquivo: Ensaio do Controlador Embarcado da Base
-## Revisão: 1 [03/03/2017]
+## Revisão: 2 [19/03/2017]
 ###########################################################################################
+###########################################################################################
+
+###########################################################################################
+# INSTRUÇÕES
+###########################################################################################
+# 1. Faça upload do código "Nanook_Base_Controller" para a FRDM-K64F
+# 2. Certifique-se de que os encoders estão conectados à placa de interface
+# 3. Certifique-se de que o driver dos motores está conectado à placa de interface
+# 4. Encontre a porta serial da conexão. Pode-se utilizar o comando:
+#    $ ls /dev/ttyACM*
+# 5. Alterar o primeiro argumento na instanciação da base "NanookBase" para o valor
+#    enconcontrado
+# 6. Executar o script
+# 7. Fornecer os parâmetros do ensaio
+# 8. Executar o script "plot_ensaio_controlador_base.py" para plotar os resultados
 ###########################################################################################
 
 import rospy
@@ -23,11 +38,11 @@ from base_driver import NanookBase
 ### INICIALIZAÇÃO
 ###########################################################################################
 
-### Inicialização do nó ###
+##### Inicialização do nó #####
 
 rospy.init_node('ensaio_controlador_base')
 
-### Conexão com o driver controlador da base (FRDM K64F) ###
+##### Conexão com o driver controlador da base (FRDM K64F) #####
 
 # Instanciação 
 
@@ -43,15 +58,15 @@ base.reset_base()
 base.set_pose(0.0, 0.0, pi/2)
 rospy.sleep(0.5)
 
-### Parâmetros definidos pelo usuário ###
+##### Parâmetros definidos pelo usuário #####
 
 ensaio = int(raw_input('Número do Ensaio: '))
 freq = float(raw_input('Frequência de Amostragem [Hz]: '))
 n_samples = int(raw_input('Número de Amostras: '))
-left_vel_ref = float(raw_input('Velocidade de Referência Esquerda [RPM]: '))
 right_vel_ref = float(raw_input('Velocidade de Referência Direita [RPM]: '))
+left_vel_ref = float(raw_input('Velocidade de Referência Esquerda [RPM]: '))
 
-### Parâmetros fixos ###
+##### Parâmetros fixos #####
 
 # Período de amostragem
 
@@ -62,7 +77,18 @@ Ts = 1.0 / freq
 wheel_diameter = 0.17       # Diâmetro das rodas [m]
 wheel_separation = 0.405    # Separação entre duas rodas [m]
 
-### Arquivo para salvar os resultados ###
+##### Listas com os dados do ensaio #####
+
+time_list = []          # Tempo [s]
+right_vel_list = []     # Velocidade direita [RPM]
+left_vel_list = []      # Velocidade esquerda [RPM]
+x_list = []             # Posição no eixo x [m]
+y_list = []             # Posição no eixo y [m]
+theta_list = []         # Orientação [rad]
+v_list = []             # Velocidade linear da base [m/s]
+w_list = []             # Velocidade angular da base [rad/s]
+
+##### Arquivo para salvar os resultados #####
 
 # Diretório
 
@@ -76,17 +102,17 @@ data_file = open(path, 'w')
 
 # Registro dos parâmetros do ensaio
 
-params_str  = '*** Ensaio do Controlador Embarcado da Base ***\n\n'
-params_str += '* Parâmetros *\n\n'
-params_str += '- Número do Ensaio: %d\n' % ensaio
-params_str += '- Frequência de Amostragem: %.1f Hz\n' % freq
-params_str += '- Número de Amostras: %d\n' % n_samples
-params_str += '- Velocidade de Referência Esquerda: %.2f RPM\n' % left_vel_ref
-params_str += '- Velocidade de Referência Direita: %.2f RPM\n\n' % right_vel_ref
+params_str  = '### Ensaio do Controlador Embarcado da Base ###\n\n'
+params_str += '# Parâmetros #\n\n'
+params_str += '# Número do Ensaio: %d\n' % ensaio
+params_str += '# Frequência de Amostragem: %.1f Hz\n' % freq
+params_str += '# Número de Amostras: %d\n' % n_samples
+params_str += '# Velocidade de Referência Esquerda: %.2f RPM\n' % left_vel_ref
+params_str += '# Velocidade de Referência Direita: %.2f RPM\n\n' % right_vel_ref
 
 data_file.write(params_str)
 
-### Variáveis ###
+##### Variáveis #####
 
 # Controle de tempo
 
@@ -96,16 +122,14 @@ last_time = rospy.get_time()   # Instante de tempo da última leitura
 ### FUNÇÕES AUXILIARES
 ###########################################################################################
 
-###########################################################################################
-
-def convert_to_base_vel(left_vel, right_vel):
+def convert_to_base_vel(right_vel, left_vel):
 
     """Conversão de velocidade individuais [RPM] para velocidades linear [m/s]
        e angular [rad/s] da base
 
     Parâmetros:
-        left_vel (float): Velocidade esquerda [RPM]
         right_vel (float): Velocidade direita [RPM]
+        left_vel (float): Velocidade esquerda [RPM]
 
     Retorno:
         tuple: (Velocidade linear [m/s],
@@ -115,8 +139,8 @@ def convert_to_base_vel(left_vel, right_vel):
 
     # Conversão das velocidades individuais de [RPM] para [m/s]
 
-    left_vel *= pi * wheel_diameter / 60.0
     right_vel *= pi * wheel_diameter / 60.0
+    left_vel *= pi * wheel_diameter / 60.0
 
     # Conversão para velocidades linear e angular da base
 
@@ -141,24 +165,24 @@ def convert_to_wheel_vel(v, w):
         w (float): Velocidade linear [rad/s]
 
     Retorno:
-        tuple: (Velocidade esquerda [RPM],
-                Velocidade direita [RPM])
+        tuple: (Velocidade direita [RPM],
+                Velocidade esquerda [RPM])
 
     """
 
     # Conversão para velocidades individuais  [m/s]
 
-    left_vel  = 1.0 * v - wheel_separation * w / 2.0
     right_vel = 1.0 * v + wheel_separation * w / 2.0
+    left_vel  = 1.0 * v - wheel_separation * w / 2.0
 
     # Transformação das velocidades para [RPM]
 
-    left_vel  *= 60.0 / (pi * wheel_diameter)
     right_vel *= 60.0 / (pi * wheel_diameter)
+    left_vel  *= 60.0 / (pi * wheel_diameter)
 
     # Retorno das velocidades convertidas
 
-    return (left_vel, right_vel)
+    return (right_vel, left_vel)
 
 ###########################################################################################
 
@@ -202,29 +226,22 @@ def spin():
 
         # Conversão das velocidades linear e angular para velocidades individuais [RPM]
 
-        (left_vel, right_vel) = convert_to_wheel_vel(v, w)
+        (right_vel, left_vel) = convert_to_wheel_vel(v, w)
 
         print('* Velocidades:')
-        print('- V_l = %.5f RPM' % left_vel)
         print('- V_r = %.5f RPM' % right_vel)
+        print('- V_l = %.5f RPM' % left_vel)
 
-        # Registro das leituras no arquivo
+        # Atualização das listas com os dados
 
-        sample_str = '%d' % sample                  # Amostra
-        time_str = '%.5f' % last_time               # Tempo [s]
-        left_ref_str = '%.3f' % left_vel_ref        # Velocidade de referência esquerda [RPM]
-        left_vel_str = '%.5f' % left_vel            # Velocidade esquerda [RPM]
-        right_ref_str = '%.3f' % right_vel_ref      # Velocidade de referência direita [RPM]
-        right_vel_str = '%.5f' % right_vel          # Velocidade direita [RPM]
-        x_str = '%.5f' % x                          # Posição no eixo x [m]
-        y_str = '%.5f' % y                          # Posição no eixo y [m]
-        theta_str = '%.5f' % (theta * 180 / pi)     # Orientação [graus]
-        v_str = '%.5f' % v                          # Velocidade linear [m/s]
-        w_str = '%.5f' % w                          # Velocidade angular [rad/s]
-
-        data_file.write('# {0} {1} {2} {3} {4} {5} {6} {7} {8} {9} {10}\n'.format(
-            sample_str, time_str, left_ref_str, left_vel_str, right_ref_str, right_vel_str,
-            x_str, y_str, theta_str, v_str, w_str))
+        time_list.append(t_iter)
+        right_vel_list.append(right_vel)
+        left_vel_list.append(left_vel)
+        x_list.append(x)
+        y_list.append(y)
+        theta_list.append(theta) 
+        v_list.append(v)
+        w_list.append(w)
 
         # Incremento do contador de amostras
 
@@ -266,11 +283,37 @@ def finalize():
 
     base.disconnect()
 
-    # Fechamento do arquivo com os dados
+    # Registro dos resultados no arquivo
+
+    # Listas com as velocidades de referência
+
+    right_vel_ref_list = [right_vel_ref] * len(time_list)
+    left_vel_ref_list = [left_vel_ref] * len(time_list)
+
+    # Desconto do instante inicial (deve ser 0 s)
+
+    t0 = time_list[0]
+    time_list = [(t - t0) for t in time_list]
+
+    # Salvando resultados no arquivo
+
+    for idx in range(len(time_list)):
+        data_file.write('* {0} {1} {2} {3} {4} {5} {6} {7} {8} {9} {10}\n'.format(
+            idx + 1,                    # Amostra
+            time_list[idx],             # Tempo [s]
+            right_vel_ref_list[idx],    # Velocidade de referência direita [RPM]
+            right_vel_list[idx],        # Velocidade direita [RPM]
+            left_vel_ref_list[idx],     # Velocidade de referência esquerda [RPM]
+            left_vel_list[idx],         # Velocidade esquerda [RPM]
+            x_list[idx],                # Posição no eixo x [m]
+            y_list[idx],                # Posição no eixo y [m]
+            theta_list[idx],            # Orientação [rad]
+            v_list[idx],                # Velocidade linear da base [m/s]
+            w_list[idx]))               # Velocidade angulas da base [rad/s]
+
+    # Fechando arquivo com os dados
 
     data_file.close()
-
-###########################################################################################
 
 ###########################################################################################
 ### EXECUÇÃO
@@ -281,7 +324,7 @@ if __name__ == '__main__':
     # Conversão das velocidades individuais de referência [RPM] para velocidades 
     # linear [m/s] e angular [rad/s] de referência da base
 
-    (v_ref, w_ref) = convert_to_base_vel(left_vel_ref, right_vel_ref)
+    (v_ref, w_ref) = convert_to_base_vel(right_vel_ref, left_vel_ref)
 
     # Envio da referência de velocidade para a base
 

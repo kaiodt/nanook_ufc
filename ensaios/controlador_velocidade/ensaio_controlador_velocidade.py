@@ -7,15 +7,15 @@
 ## Autor: Kaio Douglas Teófilo Rocha
 ## Email: kaiodtr@gmail.com
 ###########################################################################################
-## Arquivo: Ensaio para Levantamento das Plantas dos Motores
-## Revisão: 1 [16/03/2017]
+## Arquivo: Ensaio dos Controladores de Velocidade dos Motores
+## Revisão: 1 [18/03/2017]
 ###########################################################################################
 ###########################################################################################
 
 ###########################################################################################
 # INSTRUÇÕES
 ###########################################################################################
-# 1. Faça upload do código "Nanook_Motor_Plant" para a FRDM-K64F
+# 1. Faça upload do código "Nanook_Controller_Adjust" para a FRDM-K64F
 # 2. Certifique-se de que os encoders estão conectados à placa de interface
 # 3. Certifique-se de que o driver dos motores está conectado à placa de interface
 # 4. Encontre a porta serial da conexão. Pode-se utilizar o comando:
@@ -23,7 +23,7 @@
 # 5. Alterar a variável "serial_port" para o valor encontrado
 # 6. Executar o script
 # 7. Fornecer os parâmetros do ensaio
-# 8. Executar o script "plot_ensaio_planta_motores.py" para plotar os resultados
+# 8. Executar o script "plot_ensaio_controlador_velocidade.py" para plotar os resultados
 ###########################################################################################
 
 import serial
@@ -39,8 +39,8 @@ from os.path import expanduser
 ensaio = int(raw_input('Número do Ensaio: '))
 freq = float(raw_input('Frequência de Amostragem [Hz]: '))
 n_samples = int(raw_input('Número de Amostras: '))
-right_vel_ref = float(raw_input('Velocidade de Referência Direita [-1.0, 1.0]: '))
-left_vel_ref = float(raw_input('Velocidade de Referência Esquerda [-1.0, 1.0]: '))
+right_vel_ref = float(raw_input('Velocidade de Referência Direita [RPM]: '))
+left_vel_ref = float(raw_input('Velocidade de Referência Esquerda [RPM]: '))
 
 # Período de amostragem
 
@@ -58,7 +58,7 @@ time_list = []
 
 home = expanduser('~')
 path = home + '/ros_catkin_ws/src/nanook_ufc/ensaios'
-path += '/planta_motores/resultados/ensaio_%d.txt' % ensaio
+path += '/controlador_velocidade/resultados/ensaio_%d.txt' % ensaio
 
 # Abertura do arquivo
 
@@ -66,13 +66,13 @@ data_file = open(path, 'w')
 
 # Registro dos parâmetros do ensaio
 
-params_str  = '### Ensaio para Levantamento das Plantas dos Motores ###\n\n'
+params_str  = '### Ensaio dos Controladores de Velocidade dos Motores ###\n\n'
 params_str += '# Parâmetros #\n\n'
 params_str += '# Número do Ensaio: %d\n' % ensaio
 params_str += '# Frequência de Amostragem: %.1f Hz\n' % freq
 params_str += '# Número de Amostras: %d\n' % n_samples
-params_str += '# Velocidade de Referência Direita: %.1f \n' % right_vel_ref
-params_str += '# Velocidade de Referência Esquerda: %.1f \n\n' % left_vel_ref
+params_str += '# Velocidade de Referência Direita: %.3f \n' % right_vel_ref
+params_str += '# Velocidade de Referência Esquerda: %.3f \n\n' % left_vel_ref
 
 data_file.write(params_str)
 
@@ -113,17 +113,17 @@ def set_vel_ref(v_right, v_left):
     """Definição de referência de velocidade (direita e esquerda).
 
     Argumentos:
-        v_right (float): Velocidade de referência direita [-1.0, 1.0]
-        v_left (float): Velocidade de referência esquerda [-1.0, 1.0]
+        v_right (float): Velocidade de referência direita [RPM]
+        v_left (float): Velocidade de referência esquerda [RPM]
 
     """
 
     # Preparação da string a ser enviada para a base
-    # Formato: v[sig][d1].[d2][sig][e1].[e2]
+    # Formato: v[sig][d1][d2].[d3][d4][d5][sig][e1][e2].[e3][e4][e5]
     # Nota: Os pontos decimais não são enviados, por isso os valores são multiplicados
-    # por 10
+    # por 1000
 
-    ref_str = 'v{:=+03.0f}{:=+03.0f}'.format(v_right * 10, v_left * 10)
+    ref_str = 'v{:=+05.0f}{:=+05.0f}'.format(v_right * 1000, v_left * 1000)
 
     # Envio da string com a referência, um caractere por vez
 
@@ -264,11 +264,8 @@ print
 
 # Listas com as velocidades de referência
 
-right_max_vel = 30.30606    # Máxima velocidade direita
-left_max_vel = 29.87750     # Máxima velocidade esquerda
-
-right_vel_ref_list = [right_vel_ref * right_max_vel] * len(time_list)
-left_vel_ref_list = [left_vel_ref * left_max_vel] * len(time_list)
+right_vel_ref_list = [right_vel_ref] * len(time_list)
+left_vel_ref_list = [left_vel_ref] * len(time_list)
 
 # Desconto do instante inicial (deve ser 0 s)
 

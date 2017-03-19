@@ -7,8 +7,8 @@
 ## Autor: Kaio Douglas Teófilo Rocha
 ## Email: kaiodtr@gmail.com
 ###########################################################################################
-## Arquivo: Plotter de Ensaios do Controlador Embarcado da Base
-## Revisão: 1 [03/03/2017]
+## Arquivo: Plotter de Ensaios dos Controladores de Velocidade dos Motores
+## Revisão: 1 [18/03/2017]
 ###########################################################################################
 ###########################################################################################
 
@@ -27,7 +27,7 @@ ensaio = int(raw_input('Número do Ensaio: '))
 
 home = expanduser('~')
 path = home + '/ros_catkin_ws/src/nanook_ufc/ensaios'
-path += '/controlador_base/resultados/ensaio_%d.txt' % ensaio
+path += '/controlador_velocidade/resultados/ensaio_%d.txt' % ensaio
 
 # Abertura do arquivo
 
@@ -41,11 +41,6 @@ right_vel_ref = []  # Velocidade de referência direita [RPM]
 right_vel = []      # Velocidade direita [RPM]
 left_vel_ref = []   # Velocidade de referência esquerda [RPM]
 left_vel = []       # Velocidade esquerda [RPM]
-x = []              # Posição no eixo x [m]
-y = []              # Posição no eixo y [m]
-theta = []          # Orientação [graus]
-v = []              # Velocidade linear [m/s]
-w = []              # Velocidade angular [rad/s]
 
 ###########################################################################################
 ### LEITURA DO ARQUIVO
@@ -62,14 +57,9 @@ for line in data_file:
         samples.append(int(line[1]))
         t.append(float(line[2]))
         right_vel_ref.append(float(line[3]))
-        right_vel.append(float(line[4]))
+        right_vel.append(float(line[4]))        
         left_vel_ref.append(float(line[5]))
         left_vel.append(float(line[6]))
-        x.append(float(line[7]))
-        y.append(float(line[8]))
-        theta.append(float(line[9]))
-        v.append(float(line[10]))
-        w.append(float(line[11]))
 
 # Fechamento do arquivo
 
@@ -80,91 +70,24 @@ data_file.close()
 ###########################################################################################
 
 plt.close('all')
-
-# Pose
-
 plt.figure(1)
-
-# Posição no eixo x [m] | Tempo [s]
-
-plt.subplot(2, 2, 1)
-plt.plot(t, x, 'b-')
-plt.title('x')
-plt.xlabel('Tempo (s)')
-plt.ylabel('x (m)')
-plt.grid('on')
-
-# Posição no eixo y [m] | Tempo [s]
-
-plt.subplot(2, 2, 2)
-plt.plot(t, y, 'b-')
-plt.title('y')
-plt.xlabel('Tempo (s)')
-plt.ylabel('y (m)')
-plt.grid('on')
-
-# Orientação [graus] | Tempo [s]
-
-plt.subplot(2, 2, 3)
-plt.plot(t, theta, 'b-')
-plt.title('theta')
-plt.xlabel('Tempo (s)')
-plt.ylabel('theta (graus)')
-plt.grid('on')
-
-# Posição no eixo y [m] | Posição no eixo x [m]
-
-plt.subplot(2, 2, 4)
-plt.plot(x, y, 'b-')
-plt.title('Posicao')
-plt.xlabel('x (m)')
-plt.ylabel('y (m)')
-plt.grid('on')
-
-# Velocidade
-
-plt.figure(2)
 
 # Velocidade direita [RPM] | Tempo [s]
 
-plt.subplot(2, 2, 1)
-plt.plot(t, right_vel_ref, 'r--')
-plt.hold(True)
-plt.plot(t, right_vel, 'b-')
+plt.subplot(1, 2, 1)
+plt.plot(t, right_vel_ref, 'r--', t, right_vel, 'b-')
 plt.title('Velocidade Direita')
 plt.xlabel('Tempo (s)')
-plt.ylabel('v_right (RPM)')
+plt.ylabel('Velocidade (RPM)')
 plt.grid('on')
-plt.hold(False)
 
 # Velocidade esquerda [RPM] | Tempo [s]
 
-plt.subplot(2, 2, 2)
-plt.plot(t, left_vel_ref, 'r--')
-plt.hold(True)
-plt.plot(t, left_vel, 'b-')
+plt.subplot(1, 2, 2)
+plt.plot(t, left_vel_ref, 'r--', t, left_vel, 'b-')
 plt.title('Velocidade Esquerda')
 plt.xlabel('Tempo (s)')
-plt.ylabel('v_left (RPM)')
-plt.grid('on')
-plt.hold(False)
-
-# Velocidade linear [m/s] | Tempo [s]
-
-plt.subplot(2, 2, 3)
-plt.plot(t, v, 'b-')
-plt.title('Velocidade Linear')
-plt.xlabel('Tempo (s)')
-plt.ylabel('v (m/s)')
-plt.grid('on')
-
-# Velocidade angular [rad/s] | Tempo [s]
-
-plt.subplot(2, 2, 4)
-plt.plot(t, w, 'b-')
-plt.title('Velocidade Angular')
-plt.xlabel('Tempo (s)')
-plt.ylabel('w (rad/s)')
+plt.ylabel('Velocidade (RPM)')
 plt.grid('on')
 
 # Mostrar gráficos
