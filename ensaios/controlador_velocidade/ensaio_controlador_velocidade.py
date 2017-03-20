@@ -123,7 +123,7 @@ def set_vel_ref(v_right, v_left):
     # Nota: Os pontos decimais não são enviados, por isso os valores são multiplicados
     # por 1000
 
-    ref_str = 'v{:=+05.0f}{:=+05.0f}'.format(v_right * 1000, v_left * 1000)
+    ref_str = 'v{:=+06.0f}{:=+06.0f}'.format(v_right * 1000, v_left * 1000)
 
     # Envio da string com a referência, um caractere por vez
 

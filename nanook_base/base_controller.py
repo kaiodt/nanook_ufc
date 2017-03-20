@@ -64,7 +64,7 @@ class BaseController(object):
         # Dimensões do robô
 
         self.wheel_diameter = rospy.get_param('~wheel_diameter', 0.17)      # [m]
-        self.wheel_separation = rospy.get_param('~wheel_separation', 0.405) # [m]
+        self.wheel_separation = rospy.get_param('~wheel_separation', 0.408) # [m]
 
         # Driver do controlador da base (FRDM K64F)
 

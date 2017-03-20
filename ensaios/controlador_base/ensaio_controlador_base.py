@@ -287,6 +287,8 @@ def finalize():
 
     # Listas com as velocidades de referência
 
+    global time_list
+    
     right_vel_ref_list = [right_vel_ref] * len(time_list)
     left_vel_ref_list = [left_vel_ref] * len(time_list)
 

@@ -78,9 +78,23 @@ legend('Referência', 'Original', 'FT Contínua', 'FT Discreta')
 
 %% PROJETO DOS CONTROLADORES
 
+% TESTE
+
+clc
+clear all
+close all
+
+Ts = 1/1000;
+
+right_tf = tf(30.5, [0.3702 1]);
+right_tf_d = c2d(right_tf, Ts);
+
+left_tf = tf(30.37, [0.378406 1]);
+left_tf_d = c2d(left_tf, Ts);
+
 % Características de resposta de malha fechada desejadas
 
-t_rise = 0.5;  % Tempo de subida desejado
+t_rise = 0.18;  % Tempo de subida desejado
 Mp = 0.001;      % Overshoot máximo desejado
 
 % Frequência natural e amortecimento correspondetes
@@ -135,10 +149,14 @@ G_left = feedback(C_left * left_tf_d, 1);
 
 figure(2);
 
+right_vel_ref = [30.5];
+left_vel_ref = [30.37];
+
 % Motor direito
 subplot(1, 2, 1);
 step(right_vel_ref(1) * Dd); hold on;
-step(right_vel_ref(1) * right_tf);
+% step(right_vel_ref(1) * right_tf);
+step(right_tf);
 step(right_vel_ref(1) * G_right);
 title('Funções de Transferência - Motor Direito')
 xlabel('Tempo')
@@ -152,7 +170,8 @@ legend('Desejada', 'Malha Aberta', 'Malha Fechada')
 % Motor esquerdo
 subplot(1, 2, 2);
 step(left_vel_ref(1) * Dd); hold on;
-step(left_vel_ref(1) * left_tf);
+step(left_tf);
+% step(left_vel_ref(1) * left_tf);
 step(left_vel_ref(1) * G_left);
 title('Funções de Transferência - Motor Esquerdo')
 xlabel('Tempo')

@@ -22,7 +22,7 @@
 		
 		<!-- Dimensões do robô -->
 		<param name="wheel_diameter" type="double" value="0.17" />
-		<param name="wheel_separation" type="double" value="0.405" />
+		<param name="wheel_separation" type="double" value="0.408" />
 
 		<!-- Driver do controlador da base (FRDM K64F) -->
 		<param name="base_serial_port" type="string" value="/dev/ttyACM0" />
