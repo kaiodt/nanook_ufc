@@ -50,9 +50,9 @@ class FixedTransformations(object):
 
         # Posição do laser (em relação ao centro da base)
 
-        self.laser_x = rospy.get_param('~laser_x', 0.2)     # [m]
+        self.laser_x = rospy.get_param('~laser_x', 0.097)   # [m]
         self.laser_y = rospy.get_param('~laser_y', 0.0)     # [m]
-        self.laser_z = rospy.get_param('~laser_z', 0.4)     # [m]
+        self.laser_z = rospy.get_param('~laser_z', 0.2375)  # [m]
 
         # Nomenclatura dos sistemas de coordenadas
 

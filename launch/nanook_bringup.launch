@@ -31,7 +31,7 @@
 		<!-- Pose inicial -->
 		<param name="x_0" type="double" value="0.0" />
 		<param name="y_0" type="double" value="0.0" />
-		<param name="theta_0" type="double" value="1.570796" />
+		<param name="theta_0" type="double" value="$(eval 3.14159265/2)" />
 
 		<!-- Nomenclatura dos sistemas de coordenadas -->
 		<param name="base_frame_id" type="string" value="base_link" />
@@ -47,9 +47,9 @@
 		<param name="publishing_frequency" type="double" value="25" />
 
 		<!-- Posição do laser (em relação ao centro da base) -->
-		<param name="laser_x" type="double" value="0.2" />	
+		<param name="laser_x" type="double" value="-0.097" />	
 		<param name="laser_y" type="double" value="0.0" />	
-		<param name="laser_z" type="double" value="0.4" />
+		<param name="laser_z" type="double" value="0.2375" />
 
 		<!-- Nomenclatura dos sistemas de coordenadas -->
 		<param name="base_frame_id" type="string" value="base_link" />

@@ -1,0 +1,39 @@
+<!-- 
+###########################################################################################
+###########################################################################################
+## Projeto: Nanook UFC
+## Autor: Kaio Douglas Teófilo Rocha
+## Email: kaiodtr@gmail.com
+###########################################################################################
+## Arquivo: Launcher do Nó do Laser Robô 
+## Revisão: 1 [23/03/2017]
+###########################################################################################
+###########################################################################################
+ -->
+
+<launch>
+
+	<!-- Nó do Laser (URG-04LX-UG01) -->
+
+	<node pkg="urg_node" type="urg_node" name="urg_laser_scanner" output="screen">
+
+		<!-- Porta serial -->
+		<param name="serial_port" type="string" value="/dev/ttyACM1" />
+
+		<!-- Velocidade da conexão serial -->
+		<param name="serial_baud" type="int" value="115200" />
+
+		<!-- Sistema de coordenadas do laser -->
+		<param name="frame_id" type="string" value="laser_scanner" />
+
+		<!-- Calibração do atraso de conexão -->
+		<param name="calibrate_time" type="bool" value="true" />
+
+		<!-- Ângulo mínimo -->
+		<param name="angle_min" type="double" value="$(eval -2/3 * 3.14159265)" />
+
+		<!-- Ângulo máximo -->
+		<param name="angle_max" type="double" value="$(eval 2/3 * 3.14159265)" />
+	</node>
+
+</launch>
