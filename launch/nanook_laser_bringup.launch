@@ -5,13 +5,57 @@
 ## Autor: Kaio Douglas Teófilo Rocha
 ## Email: kaiodtr@gmail.com
 ###########################################################################################
-## Arquivo: Launcher do Nó do Laser Robô 
+## Arquivo: Launcher do Robô com Laser
 ## Revisão: 1 [23/03/2017]
 ###########################################################################################
 ###########################################################################################
  -->
 
 <launch>
+
+	<!-- Nó Controlador de Base -->
+
+	<node pkg="nanook_ufc" type="base_controller.py" name="base_controller" output="screen">
+
+		<!-- Frequência principal -->
+		<param name="base_frequency" type="double" value="50" />
+		
+		<!-- Dimensões do robô -->
+		<param name="wheel_diameter" type="double" value="0.17" />
+		<param name="wheel_separation" type="double" value="0.408" />
+
+		<!-- Driver do controlador da base (FRDM K64F) -->
+		<param name="base_serial_port" type="string" value="/dev/ttyACM0" />
+		<param name="base_baud_rate" type="int" value="115200" />	
+
+		<!-- Pose inicial -->
+		<param name="x_0" type="double" value="0.0" />
+		<param name="y_0" type="double" value="0.0" />
+		<param name="theta_0" type="double" value="$(eval 3.14159265/2)" />
+
+		<!-- Nomenclatura dos sistemas de coordenadas -->
+		<param name="base_frame_id" type="string" value="base_link" />
+		<param name="odom_frame_id" type="string" value="odom" />
+
+	</node>
+
+	<!-- Nó Publicador de Transformações Fixas -->
+
+	<node pkg="nanook_ufc" type="fixed_tf_broadcaster.py" name="fixed_tf_broadcaster" >
+
+		<!-- Frequência de publicaçao -->
+		<param name="publishing_frequency" type="double" value="25" />
+
+		<!-- Posição do laser (em relação ao centro da base) -->
+		<param name="laser_x" type="double" value="-0.097" />	
+		<param name="laser_y" type="double" value="0.0" />	
+		<param name="laser_z" type="double" value="0.2375" />
+
+		<!-- Nomenclatura dos sistemas de coordenadas -->
+		<param name="base_frame_id" type="string" value="base_link" />
+		<param name="laser_frame_id" type="string" value="laser_scanner" />
+
+	</node>
 
 	<!-- Nó do Laser (URG-04LX-UG01) -->
 
