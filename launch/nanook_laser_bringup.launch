@@ -73,11 +73,6 @@
 		<!-- Calibração do atraso de conexão -->
 		<param name="calibrate_time" type="bool" value="true" />
 
-		<!-- Ângulo mínimo -->
-		<param name="angle_min" type="double" value="$(eval -2/3 * 3.14159265)" />
-
-		<!-- Ângulo máximo -->
-		<param name="angle_max" type="double" value="$(eval 2/3 * 3.14159265)" />
 	</node>
 
 </launch>
