@@ -1,0 +1,32 @@
+<!-- 
+###########################################################################################
+###########################################################################################
+## Projeto: Nanook UFC
+## Autor: Kaio Douglas Teófilo Rocha
+## Email: kaiodtr@gmail.com
+###########################################################################################
+## Arquivo: Launcher do Sistema de Navegação
+## Revisão: 1 [24/03/2017]
+###########################################################################################
+###########################################################################################
+ -->
+
+<launch>
+  <master auto="start"/>
+
+  <!-- Servidor do mapa -->
+
+  <node pkg="map_server" name="map_server" type="map_server" args="$(find nanook_ufc)/map.yaml"/>
+
+  <!--- AMCL -->
+
+  <include file="$(find amcl)/examples/amcl_diff.launch" />
+
+  <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
+    <rosparam file="$(find nanook_ufc)/params/costmap_common_params.yaml" command="load" ns="global_costmap" />
+    <rosparam file="$(find nanook_ufc)/params/costmap_common_params.yaml" command="load" ns="local_costmap" />
+    <rosparam file="$(find nanook_ufc)/params/local_costmap_params.yaml" command="load" />
+    <rosparam file="$(find nanook_ufc)/params/global_costmap_params.yaml" command="load" />
+    <rosparam file="$(find nanook_ufc)/params/base_local_planner_params.yaml" command="load" />
+  </node>
+</launch>

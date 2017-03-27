@@ -1,0 +1,46 @@
+TrajectoryPlannerROS:
+# Parâmetros de configuração do robô
+  max_vel_x: 0.15
+  min_vel_x: 0.01
+
+  max_vel_y: 0.0
+  min_vel_y: 0.0
+
+  max_vel_theta:  0.5
+  min_vel_theta: -0.5
+  min_in_place_vel_theta: 0.25
+  
+  acc_lim_x: 0.5
+  acc_lim_y: 0.0
+  acc_lim_theta: 0.5
+
+  holonomic_robot: false
+
+# Parâmetros de tolerância da meta
+  # yaw_goal_tolerance: 0.3
+  # xy_goal_tolerance: 0.15
+
+# Parâmetros de simulação a frente
+  sim_time: 3.0
+  vx_samples: 6
+  vy_samples: 1
+  vtheta_samples: 20
+
+# Parâmetros de pontuação de trajetória
+  meter_scoring: true
+  pdist_scale: 0.6
+  gdist_scale: 0.8
+  occdist_scale: 0.01
+  heading_lookahead: 0.325
+  dwa: true
+
+# Parâmetros de prevenção de oscilação
+  oscillation_reset_dist: 0.05
+
+# Configuração diferencial do robô
+  holonomic_robot: false
+  max_vel_y: 0.0
+  min_vel_y: 0.0
+  acc_lim_y: 0.0
+  
+  # Info em http://wiki.ros.org/base_local_planner
