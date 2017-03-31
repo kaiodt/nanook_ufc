@@ -7,7 +7,7 @@
 ## Autor: Kaio Douglas Teófilo Rocha
 ## Email: kaiodtr@gmail.com
 ###########################################################################################
-## Arquivo: Plotter de Ensaios do Controlador de Klancar (Linha Reta)
+## Arquivo: Plotter de Ensaios do Controlador de Klancar (Círculo)
 ## Revisão: 1 [31/03/2017]
 ###########################################################################################
 ###########################################################################################
@@ -27,7 +27,7 @@ ensaio = int(raw_input('Número do Ensaio: '))
 
 home = expanduser('~')
 path = home + '/ros_catkin_ws/src/nanook_ufc/controlador_klancar'
-path += '/linha_reta/resultados/ensaio_%d.txt' % ensaio
+path += '/circulo/resultados/ensaio_%d.txt' % ensaio
 
 # Abertura do arquivo
 
