@@ -25,7 +25,7 @@
 		<param name="wheel_separation" type="double" value="0.408" />
 
 		<!-- Driver do controlador da base (FRDM K64F) -->
-		<param name="base_serial_port" type="string" value="/dev/ttyACM0" />
+		<param name="base_serial_port" type="string" value="/dev/ttyACM1" />
 		<param name="base_baud_rate" type="int" value="115200" />	
 
 		<!-- Pose inicial -->
@@ -63,7 +63,7 @@
 	<node pkg="urg_node" type="urg_node" name="urg_laser_scanner" output="screen">
 
 		<!-- Porta serial -->
-		<param name="serial_port" type="string" value="/dev/ttyACM1" />
+		<param name="serial_port" type="string" value="/dev/ttyACM0" />
 
 		<!-- Velocidade da conexão serial -->
 		<param name="serial_baud" type="int" value="115200" />

@@ -42,7 +42,7 @@
 
       <!-- Outros Parâmetros -->
       <param name="pub_map_odom_transform" type="bool" value="true" />
-      <param name="output_timing" type="bool" value="false" /<name />
+      <param name="output_timing" type="bool" value="false" />
       <param name="scan_subscriber_queue_size" type="int" value="10" />
       <param name="pub_map_scanmatch_transform" type="bool" value="true" />
       <param name="tf_map_scanmatch_transform_frame_name" type="string" value="scanmatcher_frame" />
