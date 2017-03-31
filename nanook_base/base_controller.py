@@ -116,7 +116,7 @@ class BaseController(object):
 
         # Definição de pose da base
 
-        rospy.Subscriber('set_base_pose', Pose2D, self.set_base_pose)
+        rospy.Subscriber('set_base_pose', Pose2D, self.base_pose)
 
         ### Variáveis ###
 
@@ -165,7 +165,7 @@ class BaseController(object):
 
     #######################################################################################
 
-    def set_base_pose(self, base_pose):
+    def base_pose(self, base_pose):
 
         """Callback do tópico 'set_base_pose'."""
 
@@ -186,7 +186,7 @@ class BaseController(object):
 
         self.x = x
         self.y = y
-        self.theta = theta_0
+        self.theta = theta
 
     #######################################################################################
 

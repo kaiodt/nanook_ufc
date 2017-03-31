@@ -83,8 +83,9 @@ class HectorTest(object):
 
         # Publicação da pose em "set_base_pose"
 
+        print 'Publicando pose inicial'
         self.base_pose_pub.publish(pose)
-
+        print 'Pose inicial publicada'
 
     def get_pose(self, pose):
 

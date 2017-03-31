@@ -156,7 +156,7 @@ class KlancarCircle(object):
 
         ### Publicação da pose inicial da base ###
 
-        self.publish_base_pose(self.x_0, self.y_0, self.theta_0)
+        # self.publish_base_pose(self.x_0, self.y_0, self.theta_0)
 
     #######################################################################################
 
