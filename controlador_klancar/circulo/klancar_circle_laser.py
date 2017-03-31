@@ -72,9 +72,9 @@ class KlancarCircle(object):
 
         # Pose inicial
 
-        x_0 = rospy.get_param('~x_0', 0.0)          # [m]
-        y_0 = rospy.get_param('~y_0', 1.0)          # [m]
-        theta_0 = rospy.get_param('~theta_0', pi/2.0)  # [rad]
+        self.x_0 = rospy.get_param('~x_0', 0.0)             # [m]
+        self.y_0 = rospy.get_param('~y_0', 1.0) 	    # [m]
+        self.theta_0 = rospy.get_param('~theta_0', pi/2.0)  # [rad]
 
         ### Listas com os dados do ensaio ###
 
@@ -124,18 +124,18 @@ class KlancarCircle(object):
 
         # Pose e velocidade da base
 
-        self.x = x_0                # Posição no eixo x [m]
-        self.y = y_0                # Posição no eixo y [m]
-        self.theta = theta_0        # Orientação [rad]
+        self.x = self.x_0                # Posição no eixo x [m]
+        self.y = self.y_0                # Posição no eixo y [m]
+        self.theta = self.theta_0        # Orientação [rad]
 
         self.v = 0.0                # Velocidade linear da base [m/s]
         self.w = 0.0                # Velocidade angular da base [rad/s]
 
         # Nova pose e velocidades da base recebidas (válida na próxima iteração)
 
-        self.new_x = x_0            # Posição no eixo x [m]
-        self.new_y = y_0            # Posição no eixo y [m]
-        self.new_theta = theta_0    # Orientação [rad]
+        self.new_x = self.x_0            # Posição no eixo x [m]
+        self.new_y = self.y_0            # Posição no eixo y [m]
+        self.new_theta = self.theta_0    # Orientação [rad]
 
         self.new_v = 0.0            # Velocidade linear da base [m/s]
         self.new_w = 0.0            # Velocidade angular da base [rad/s]
@@ -206,14 +206,18 @@ class KlancarCircle(object):
 
         # Normalizando ângulo
 
-        if yaw < 0:
+        yaw += self.theta_0
+
+        if yaw > 2 * pi:
+          yaw -= 2 * pi
+        elif yaw < 0:
           yaw += 2 * pi
 
         # Atualizando a pose
 
-        self.new_x = pose.pose.position.x + self.x_0  # Posição no eixo x [m]
-        self.new_y = pose.pose.position.y + self.y_0  # Posição no eixo y [m]
-        self.new_theta = yaw + self.theta_0           # Orientação [rad]
+        self.new_x = pose.pose.position.x + self.x_0	# Posição no eixo x [m]
+        self.new_y = pose.pose.position.y + self.y_0	# Posição no eixo y [m]
+        self.new_theta = yaw		   		# Orientação [rad]
 
     #######################################################################################
 
