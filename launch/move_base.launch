@@ -23,7 +23,7 @@
   <include file="$(find amcl)/examples/amcl_diff.launch" />
 
   <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
-    <param name="controller_frequency" value="10.0" />
+    <param name="controller_frequency" value="5.0" />
 
     <rosparam file="$(find nanook_ufc)/params/costmap_common_params.yaml" command="load" ns="global_costmap" />
 
