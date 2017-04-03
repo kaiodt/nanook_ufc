@@ -230,7 +230,10 @@ class KlancarCircle(object):
 
         # Convertendo a velocidade para o frame da base (somente no eixo x)
 
-        v = odometry.twist.twist.linear.x / cos(self.new_theta)
+        # v = odometry.twist.twist.linear.x / cos(self.new_theta)
+
+        v = sqrt(pow(odometry.twist.twist.linear.x, 2) + \
+                 pow(odometry.twist.twist.linear.y, 2))
 
         # Atualizando as velocidades
 
