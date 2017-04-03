@@ -73,8 +73,8 @@ class KlancarCircle(object):
         # Pose inicial
 
         x_0 = rospy.get_param('~x_0', 0.0)          # [m]
-        y_0 = rospy.get_param('~y_0', 0.0)          # [m]
-        theta_0 = rospy.get_param('~theta_0', 0.0)  # [rad]
+        y_0 = rospy.get_param('~y_0', 1.0)          # [m]
+        theta_0 = rospy.get_param('~theta_0', pi/2.0)  # [rad]
 
         ### Listas com os dados do ensaio ###
 
@@ -211,9 +211,9 @@ class KlancarCircle(object):
 
         # Atualizando a pose
 
-        self.new_x = pose.pose.position.x   # Posição no eixo x [m]
-        self.new_y = pose.pose.position.y   # Posição no eixo y [m]
-        self.new_theta = yaw                # Orientação [rad]
+        self.new_x = pose.pose.position.x + self.x_0  # Posição no eixo x [m]
+        self.new_y = pose.pose.position.y + self.y_0  # Posição no eixo y [m]
+        self.new_theta = yaw + self.theta_0           # Orientação [rad]
 
     #######################################################################################
 
