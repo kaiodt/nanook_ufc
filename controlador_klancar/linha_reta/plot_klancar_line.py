@@ -87,20 +87,53 @@ data_file.close()
 
 plt.close('all')
 
+# Pose
+
 plt.figure(1)
 
 # Posição no eixo y [m] | Posição no eixo x [m]
 
-plt.subplot(2, 3, 1)
+plt.subplot(2, 2, 1)
 plt.plot(x_ref_list, y_ref_list, 'r--', x_list, y_list, 'b-')
 plt.title('Trajetoria XY')
 plt.xlabel('x (m)')
 plt.ylabel('y (m)')
 plt.grid('on')
 
+# Posição no eixo x [m] | Tempo [s]
+
+plt.subplot(2, 2, 2)
+plt.plot(time_list, x_ref_list, 'r--', time_list, x_list, 'b-')
+plt.title('Posicao no Eixo X')
+plt.xlabel('Tempo (s)')
+plt.ylabel('x (m)')
+plt.grid('on')
+
+# Orientação [rad] | Tempo [s]
+
+plt.subplot(2, 2, 3)
+plt.plot(time_list, theta_ref_list, 'r--', time_list, theta_list, 'b-')
+plt.title('Orientacao')
+plt.xlabel('Tempo (s)')
+plt.ylabel('theta (rad)')
+plt.grid('on')
+
+# Posição no eixo y [m] | Tempo [s]
+
+plt.subplot(2, 2, 4)
+plt.plot(time_list, y_ref_list, 'r--', time_list, y_list, 'b-')
+plt.title('Posicao no Eixo Y')
+plt.xlabel('Tempo (s)')
+plt.ylabel('y (m)')
+plt.grid('on')
+
+# Velocidade
+
+plt.figure(2)
+
 # Velocidade linear [m/s] | Tempo [s]
 
-plt.subplot(2, 3, 2)
+plt.subplot(2, 2, 1)
 plt.plot(time_list, v_ref_list, 'r--', time_list, v_list, 'b-')
 plt.title('Velocidade Linear')
 plt.xlabel('Tempo (s)')
@@ -109,25 +142,16 @@ plt.grid('on')
 
 # Controle de velocidade linear [m/s] | Tempo [s]
 
-plt.subplot(2, 3, 3)
+plt.subplot(2, 2, 2)
 plt.plot(time_list, u_v_list, 'b-')
 plt.title('Controle Velocidade Linear')
 plt.xlabel('Tempo (s)')
 plt.ylabel('u_v (m/s)')
 plt.grid('on')
 
-# Orientação [rad] | Tempo [s]
-
-plt.subplot(2, 3, 4)
-plt.plot(time_list, theta_ref_list, 'r--', time_list, theta_list, 'b-')
-plt.title('Trajetoria Theta')
-plt.xlabel('Tempo (s)')
-plt.ylabel('theta (rad)')
-plt.grid('on')
-
 # Velocidade angular [rad/s] | Tempo [s]
 
-plt.subplot(2, 3, 5)
+plt.subplot(2, 2, 3)
 plt.plot(time_list, w_ref_list, 'r--', time_list, w_list, 'b-')
 plt.title('Velocidade Angular')
 plt.xlabel('Tempo (s)')
@@ -136,7 +160,7 @@ plt.grid('on')
 
 # Controle de velocidade angular [rad/s] | Tempo [s]
 
-plt.subplot(2, 3, 6)
+plt.subplot(2, 2, 4)
 plt.plot(time_list, u_w_list, 'b-')
 plt.title('Controle Velocidade Angular')
 plt.xlabel('Tempo (s)')
