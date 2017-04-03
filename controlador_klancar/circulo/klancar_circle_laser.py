@@ -73,7 +73,7 @@ class KlancarCircle(object):
         # Pose inicial
 
         self.x_0 = rospy.get_param('~x_0', 0.0)             # [m]
-        self.y_0 = rospy.get_param('~y_0', 1.0) 	    # [m]
+        self.y_0 = rospy.get_param('~y_0', 1.0)         # [m]
         self.theta_0 = rospy.get_param('~theta_0', pi/2.0)  # [rad]
 
         ### Listas com os dados do ensaio ###
@@ -202,22 +202,22 @@ class KlancarCircle(object):
         (row, pitch, yaw) = euler_from_quaternion([orientation.x,
                                                    orientation.y,
                                                    orientation.z,
-                                                   orientation.w])     
+                                                   orientation.w])
 
         # Normalizando ângulo
 
         yaw += self.theta_0
 
         if yaw > 2 * pi:
-          yaw -= 2 * pi
+            yaw -= 2 * pi
         elif yaw < 0:
-          yaw += 2 * pi
+            yaw += 2 * pi
 
         # Atualizando a pose
 
-        self.new_x = pose.pose.position.x + self.x_0	# Posição no eixo x [m]
-        self.new_y = pose.pose.position.y + self.y_0	# Posição no eixo y [m]
-        self.new_theta = yaw		   		# Orientação [rad]
+        self.new_x = pose.pose.position.x + self.x_0    # Posição no eixo x [m]
+        self.new_y = pose.pose.position.y + self.y_0    # Posição no eixo y [m]
+        self.new_theta = yaw                            # Orientação [rad]
 
     #######################################################################################
 
