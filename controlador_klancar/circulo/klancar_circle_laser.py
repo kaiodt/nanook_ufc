@@ -61,14 +61,14 @@ class KlancarCircle(object):
         # Parâmetros do controlador
 
         self.ksi = rospy.get_param("~ksi", 0.8)
-        self.g = rospy.get_param("~g", 20.0)
+        self.g = rospy.get_param("~g", 30.0)
         self.w_n = rospy.get_param("~w_n", 
             sqrt(pow(self.base_ang_speed, 2) + self.g * pow(self.base_lin_speed, 2)))
 
         # Valores máximos de velocidade
 
-        self.v_max = rospy.get_param("~v_max", 0.3)
-        self.w_max = rospy.get_param("~w_max", 0.8)
+        self.v_max = rospy.get_param("~v_max", 0.5)
+        self.w_max = rospy.get_param("~w_max", 1.0)
 
         # Pose inicial
 
