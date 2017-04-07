@@ -7,7 +7,7 @@
 ## Autor: Kaio Douglas Teófilo Rocha
 ## Email: kaiodtr@gmail.com
 ###########################################################################################
-## Arquivo: Plotter de Ensaios do Controlador de Klancar (Círculo)
+## Arquivo: Plotter de Ensaios do Controlador de Klancar (Linha Reta)
 ## Revisão: 1 [31/03/2017]
 ###########################################################################################
 ###########################################################################################
@@ -27,7 +27,7 @@ ensaio = int(raw_input('Número do Ensaio: '))
 
 home = expanduser('~')
 path = home + '/ros_catkin_ws/src/nanook_ufc/controlador_klancar'
-path += '/circulo/resultados/ensaio_%d.txt' % ensaio
+path += '/ensaios_sem_erro/linha_reta/ensaio_%d.txt' % ensaio
 
 # Abertura do arquivo
 
@@ -49,10 +49,6 @@ v_list = []             # Velocidade linear da base [m/s]
 w_list = []             # Velocidade angular da base [rad/s]
 u_v_list = []           # Comando de velocidade linear da base [m/s]
 u_w_list = []           # Comando de velocidade angulat da base [rad/s]
-x_error_list = []       # Erro de posição no eixo x [m]
-y_error_list = []       # Erro de posição no eixo y [m]
-theta_error_list = []   # Erro de orientação [rad]
-
 
 ###########################################################################################
 ### LEITURA DO ARQUIVO
@@ -80,9 +76,6 @@ for line in data_file:
         w_list.append(float(line[12]))
         u_v_list.append(float(line[13]))
         u_w_list.append(float(line[14]))
-        x_error_list.append(float(line[15]))
-        y_error_list.append(float(line[16]))
-        theta_error_list.append(float(line[17]))
 
 # Fechamento do arquivo
 
@@ -172,35 +165,6 @@ plt.plot(time_list, u_w_list, 'b-')
 plt.title('Controle Velocidade Angular')
 plt.xlabel('Tempo (s)')
 plt.ylabel('u_w (rad/s)')
-plt.grid('on')
-
-plt.figure(3)
-
-# Erro de posição no eixo x [m] | Tempo [s]
-
-plt.subplot(2, 2, 1)
-plt.plot(time_list, x_error_list, 'b-')
-plt.title('Erro de Posicao no Eixo x')
-plt.xlabel('Tempo (s)')
-plt.ylabel('erro_x (m)')
-plt.grid('on')
-
-# Erro de posição no eixo y [m] | Tempo [s]
-
-plt.subplot(2, 2, 2)
-plt.plot(time_list, y_error_list, 'b-')
-plt.title('Erro de Posicao no Eixo y')
-plt.xlabel('Tempo (s)')
-plt.ylabel('erro_y (m)')
-plt.grid('on')
-
-# Erro de orientação [rad] | Tempo [s]
-
-plt.subplot(2, 2, 3)
-plt.plot(time_list, theta_error_list, 'b-')
-plt.title('Erro de Orientacao')
-plt.xlabel('Tempo (s)')
-plt.ylabel('erro_theta (rad)')
 plt.grid('on')
 
 # Mostrar gráficos

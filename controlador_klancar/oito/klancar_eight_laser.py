@@ -7,8 +7,8 @@
 ## Autor: Kaio Douglas Teófilo Rocha
 ## Email: kaiodtr@gmail.com
 ###########################################################################################
-## Arquivo: Nó Controlador de Trajetória de Klancar (Círculo)
-## Revisão: 1 [31/03/2017]
+## Arquivo: Nó Controlador de Trajetória de Klancar (Oito)
+## Revisão: 1 [06/04/2017]
 ###########################################################################################
 ###########################################################################################
 
@@ -25,7 +25,7 @@ from numpy import sign
 from os.path import expanduser
 
 ###########################################################################################
-class KlancarCircle(object):
+class KlancarEight(object):
 ###########################################################################################
 
     #######################################################################################
@@ -34,7 +34,7 @@ class KlancarCircle(object):
 
         ### Inicialização do nó ###
 
-        rospy.init_node('klancar_laser_circle')
+        rospy.init_node('klancar_laser_eight')
 
         ### Definição dos parâmetros ###
 
@@ -72,9 +72,9 @@ class KlancarCircle(object):
 
         # Pose inicial
 
-        self.x_0 = rospy.get_param('~x_0', -0.5)             # [m]
-        self.y_0 = rospy.get_param('~y_0', -0.5)             # [m]
-        self.theta_0 = rospy.get_param('~theta_0', pi/2.0)  # [rad]
+        self.x_0 = rospy.get_param('~x_0', 0.0)         # [m]
+        self.y_0 = rospy.get_param('~y_0', 0.0)         # [m]
+        self.theta_0 = rospy.get_param('~theta_0', 0.0) # [rad]
 
         ### Listas com os dados do ensaio ###
 
@@ -97,7 +97,7 @@ class KlancarCircle(object):
 
         ### Gerando a trajetória ###
 
-        self.generate_circle()
+        self.generate_eight()
 
         # Número de iterações
 
@@ -152,30 +152,53 @@ class KlancarCircle(object):
 
     #######################################################################################
 
-    def generate_circle(self):
+    def generate_eight(self):
 
-        """Geração do círculo que deverá ser seguido."""
+        """Geração da trajetória em oito que deverá ser seguida."""
 
-        # Número de pontos
+        # Número de pontos por círculo
 
-        N = int(2 * pi / (self.base_ang_speed * self.Ts)) + 1
+        Nc = int(2 * pi / (self.base_ang_speed * self.Ts)) + 1
+
+        # Número total de pontos
+
+        N = 2 * Nc
 
         # Atualizando as listas com parâmetros constantes da trajetória
 
         self.v_ref_list = [self.base_lin_speed] * N
-        self.w_ref_list = [self.base_ang_speed] * N
 
-        # Inicializando as listas relativas à pose
+        # Inicializando as listas de variáveis
+
+        self.w_ref_list = [0.0] * N
 
         self.x_ref_list = [0.0] * N
         self.y_ref_list = [0.0] * N
         self.theta_ref_list = [0.0] * N
 
-        # Gerando os pontos de referência de pose
+        # Gerando os pontos de referência de pose e velocidade angular
 
-        for i in range(1, N):
+        # Círculo 1
+        for i in range(1, Nc+1):
+            self.w_ref_list[i] = self.base_ang_speed
+
             self.theta_ref_list[i] = \
                 self.theta_ref_list[i-1] + self.base_ang_speed * self.Ts
+
+            self.x_ref_list[i] = \
+                self.x_ref_list[i-1] + self.base_lin_speed * \
+                                       cos(self.theta_ref_list[i]) * self.Ts
+
+            self.y_ref_list[i] = \
+                self.y_ref_list[i-1] + self.base_lin_speed * \
+                                       sin(self.theta_ref_list[i]) * self.Ts
+
+        # Círculo 2
+        for i in range(Nc+1, N):
+            self.w_ref_list[i] = -self.base_ang_speed
+
+            self.theta_ref_list[i] = \
+                self.theta_ref_list[i-1] - self.base_ang_speed * self.Ts
 
             self.x_ref_list[i] = \
                 self.x_ref_list[i-1] + self.base_lin_speed * \
@@ -410,7 +433,7 @@ class KlancarCircle(object):
 
         home = expanduser('~')
         path = home + '/ros_catkin_ws/src/nanook_ufc/controlador_klancar'
-        path += '/circulo/resultados/ensaio_%d.txt' % self.ensaio
+        path += '/oito/resultados/ensaio_%d.txt' % self.ensaio
 
         # Abertura do arquivo
 
@@ -418,7 +441,7 @@ class KlancarCircle(object):
 
         # Registro dos parâmetros do ensaio
 
-        params_str  = '### Ensaio do Controlador Klancar com Laser (Círculo) ###\n\n'
+        params_str  = '### Ensaio do Controlador Klancar com Laser (Oito) ###\n\n'
         params_str += '# Parâmetros #\n\n'
         params_str += '# Número do Ensaio: %d\n' % self.ensaio
         params_str += '# Frequência: %.1f Hz\n' % self.frequency
@@ -487,19 +510,19 @@ if __name__ == '__main__':
 
     # Instanciação do controlador de trajetória
 
-    klancar_circle = KlancarCircle()
+    klancar_eight = KlancarEight()
 
     # Execução do laço principal
 
-    klancar_circle.spin()
+    klancar_eight.spin()
 
     # Registro dos dados do ensaio em um arquivo
 
-    klancar_circle.write_file()
+    klancar_eight.write_file()
 
     # Finalização
 
-    klancar_circle.finalize()
+    klancar_eight.finalize()
 
     print("[INFO] Trajetória concluída.")
 

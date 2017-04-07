@@ -86,6 +86,9 @@ class KlancarLine(object):
         self.w_list = []            # Velocidade angular da base [rad/s]
         self.u_v_list = []          # Comando de velocidade linear da base [m/s]
         self.u_w_list = []          # Comando de velocidade angulat da base [rad/s]
+        self.x_error_list = []      # Erro de posição no eixo x [m]
+        self.y_error_list = []      # Erro de posição no eixo y [m]
+        self.theta_error_list = []  # Erro de orientação [rad]
 
         ### Gerando a trajetória ###
 
@@ -242,7 +245,13 @@ class KlancarLine(object):
 
         if theta_error < - pi:
             theta_error = - theta_error
+        
+        # Atualização das listas de erros
 
+        self.x_error_list.append(x_error)
+        self.y_error_list.append(y_error)
+        self.theta_error_list.append(theta_error)
+        
         # Fatores e
 
         e1 = cos(self.theta) * x_error + sin(self.theta) * y_error
@@ -413,21 +422,25 @@ class KlancarLine(object):
         # Salvando resultados no arquivo
 
         for idx in range(len(self.time_list)):
-            data_file.write('* {0} {1} {2} {3} {4} {5} {6} {7} {8} {9} {10} {11} {12} {13}\n'.format(
-                idx + 1,                    # Amostra
-                self.time_list[idx],        # Tempo [s]
-                self.x_ref_list[idx],       # Referência de posição no eixo x [m]
-                self.y_ref_list[idx],       # Referência de posição no eixo y [m]
-                self.theta_ref_list[idx],   # Referência de orientação [rad]
-                self.v_ref_list[idx],       # Referência de velocidade linear da base [m/s]
-                self.w_ref_list[idx],       # Referência de velocidade angular da base [rad/s]
-                self.x_list[idx],           # Posição no eixo x [m]
-                self.y_list[idx],           # Posição no eixo y [m]
-                self.theta_list[idx],       # Orientação [rad]
-                self.v_list[idx],           # Velocidade linear da base [m/s]
-                self.w_list[idx],           # Velocidade angular da base [rad/s]
-                self.u_v_list[idx],         # Comando de velocidade linear da base [m/s]
-                self.u_w_list[idx]))        # Comando de velocidade angulat da base [rad/s]
+            data_file.write('* {0} {1} {2} {3} {4} {5} {6} {7} {8} {9} {10} \
+                               {11} {12} {13} {14} {15} {16}\n'.format(
+                idx + 1,                        # Amostra
+                self.time_list[idx],            # Tempo [s]
+                self.x_ref_list[idx],           # Referência de posição no eixo x [m]
+                self.y_ref_list[idx],           # Referência de posição no eixo y [m]
+                self.theta_ref_list[idx],       # Referência de orientação [rad]
+                self.v_ref_list[idx],           # Referência de velocidade linear da base [m/s]
+                self.w_ref_list[idx],           # Referência de velocidade angular da base [rad/s]
+                self.x_list[idx],               # Posição no eixo x [m]
+                self.y_list[idx],               # Posição no eixo y [m]
+                self.theta_list[idx],           # Orientação [rad]
+                self.v_list[idx],               # Velocidade linear da base [m/s]
+                self.w_list[idx],               # Velocidade angular da base [rad/s]
+                self.u_v_list[idx],             # Comando de velocidade linear da base [m/s]
+                self.u_w_list[idx],             # Comando de velocidade angular da base [rad/s]
+                self.x_error_list[idx],         # Erro de posição no eixo x [m]
+                self.y_error_list[idx],         # Erro de posição no eixo y [m]
+                self.theta_error_list[idx]))    # Erro de orientação [rad]
 
         # Fechando arquivo com os dados
 

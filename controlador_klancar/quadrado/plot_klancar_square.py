@@ -7,8 +7,8 @@
 ## Autor: Kaio Douglas Teófilo Rocha
 ## Email: kaiodtr@gmail.com
 ###########################################################################################
-## Arquivo: Plotter de Ensaios do Controlador de Klancar (Círculo)
-## Revisão: 1 [31/03/2017]
+## Arquivo: Plotter de Ensaios do Controlador de Klancar (Quadrado)
+## Revisão: 1 [05/04/2017]
 ###########################################################################################
 ###########################################################################################
 
@@ -27,7 +27,7 @@ ensaio = int(raw_input('Número do Ensaio: '))
 
 home = expanduser('~')
 path = home + '/ros_catkin_ws/src/nanook_ufc/controlador_klancar'
-path += '/circulo/resultados/ensaio_%d.txt' % ensaio
+path += '/quadrado/resultados/ensaio_%d.txt' % ensaio
 
 # Abertura do arquivo
 
@@ -52,7 +52,6 @@ u_w_list = []           # Comando de velocidade angulat da base [rad/s]
 x_error_list = []       # Erro de posição no eixo x [m]
 y_error_list = []       # Erro de posição no eixo y [m]
 theta_error_list = []   # Erro de orientação [rad]
-
 
 ###########################################################################################
 ### LEITURA DO ARQUIVO
@@ -173,6 +172,8 @@ plt.title('Controle Velocidade Angular')
 plt.xlabel('Tempo (s)')
 plt.ylabel('u_w (rad/s)')
 plt.grid('on')
+
+# Erros
 
 plt.figure(3)
 

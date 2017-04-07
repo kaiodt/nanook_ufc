@@ -7,8 +7,8 @@
 ## Autor: Kaio Douglas Teófilo Rocha
 ## Email: kaiodtr@gmail.com
 ###########################################################################################
-## Arquivo: Nó Controlador de Trajetória de Klancar (Círculo)
-## Revisão: 1 [31/03/2017]
+## Arquivo: Nó Controlador de Trajetória de Klancar (Quadrado)
+## Revisão: 1 [05/04/2017]
 ###########################################################################################
 ###########################################################################################
 
@@ -25,7 +25,7 @@ from numpy import sign
 from os.path import expanduser
 
 ###########################################################################################
-class KlancarCircle(object):
+class KlancarSquare(object):
 ###########################################################################################
 
     #######################################################################################
@@ -34,19 +34,15 @@ class KlancarCircle(object):
 
         ### Inicialização do nó ###
 
-        rospy.init_node('klancar_laser_circle')
+        rospy.init_node('klancar_laser_square')
 
         ### Definição dos parâmetros ###
 
         # Parâmetros definidos pelo usuário
 
         self.ensaio = int(raw_input('Número do Ensaio: '))
-        self.radius = float(raw_input('Raio [m]: '))
+        self.side = float(raw_input('Comprimento do Lado [m]: '))
         self.base_lin_speed = float(raw_input('Velocidade Linear da Base [m/s]: '))
-
-        # Velocidade angular da base (w = v / r)
-
-        self.base_ang_speed = self.base_lin_speed / self.radius # [rad/s]
 
         # Frequência principal
 
@@ -63,7 +59,7 @@ class KlancarCircle(object):
         self.ksi = rospy.get_param("~ksi", 0.8)
         self.g = rospy.get_param("~g", 30.0)
         self.w_n = rospy.get_param("~w_n", 
-            sqrt(pow(self.base_ang_speed, 2) + self.g * pow(self.base_lin_speed, 2)))
+            sqrt(self.g * pow(self.base_lin_speed, 2)))
 
         # Valores máximos de velocidade
 
@@ -72,9 +68,9 @@ class KlancarCircle(object):
 
         # Pose inicial
 
-        self.x_0 = rospy.get_param('~x_0', -0.5)             # [m]
-        self.y_0 = rospy.get_param('~y_0', -0.5)             # [m]
-        self.theta_0 = rospy.get_param('~theta_0', pi/2.0)  # [rad]
+        self.x_0 = rospy.get_param('~x_0', 0.0)             # [m]
+        self.y_0 = rospy.get_param('~y_0', 0.0)             # [m]
+        self.theta_0 = rospy.get_param('~theta_0', 0.0)     # [rad]
 
         ### Listas com os dados do ensaio ###
 
@@ -97,7 +93,7 @@ class KlancarCircle(object):
 
         ### Gerando a trajetória ###
 
-        self.generate_circle()
+        self.generate_square()
 
         # Número de iterações
 
@@ -127,43 +123,47 @@ class KlancarCircle(object):
 
         # Pose e velocidade da base
 
-        self.x = self.x_0                # Posição no eixo x [m]
-        self.y = self.y_0                # Posição no eixo y [m]
-        self.theta = self.theta_0        # Orientação [rad]
+        self.x = self.x_0                   # Posição no eixo x [m]
+        self.y = self.y_0                   # Posição no eixo y [m]
+        self.theta = self.theta_0           # Orientação [rad]
 
-        self.v = 0.0                # Velocidade linear da base [m/s]
-        self.w = 0.0                # Velocidade angular da base [rad/s]
+        self.v = 0.0        # Velocidade linear da base [m/s]
+        self.w = 0.0        # Velocidade angular da base [rad/s]
 
         # Nova pose e velocidades da base recebidas (válida na próxima iteração)
 
-        self.new_x = self.x_0            # Posição no eixo x [m]
-        self.new_y = self.y_0            # Posição no eixo y [m]
-        self.new_theta = self.theta_0    # Orientação [rad]
+        self.new_x = self.x_0               # Posição no eixo x [m]
+        self.new_y = self.y_0               # Posição no eixo y [m]
+        self.new_theta = self.theta_0       # Orientação [rad]
 
-        self.new_v = 0.0            # Velocidade linear da base [m/s]
-        self.new_w = 0.0            # Velocidade angular da base [rad/s]
+        self.new_v = 0.0    # Velocidade linear da base [m/s]
+        self.new_w = 0.0    # Velocidade angular da base [rad/s]
 
         # Sinais de controle de velocidades linear e angular a serem enviados para a base
 
-        self.u_v = 0.0              # Comando de velocidade linear da base [m/s]
-        self.u_w = 0.0              # Comando de velocidade angular da base [rad/s]
+        self.u_v = 0.0      # Comando de velocidade linear da base [m/s]
+        self.u_w = 0.0      # Comando de velocidade angular da base [rad/s]
 
     #######################################################################################
 
     #######################################################################################
 
-    def generate_circle(self):
+    def generate_square(self):
 
-        """Geração do círculo que deverá ser seguido."""
+        """Geração do quadrado que deverá ser seguido."""
 
-        # Número de pontos
+        # Número de pontos por lado
 
-        N = int(2 * pi / (self.base_ang_speed * self.Ts)) + 1
+        Nl = int(self.side / (self.base_lin_speed * self.Ts)) + 1
+
+        # Número total de pontos
+
+        N = 4 * Nl + 1
 
         # Atualizando as listas com parâmetros constantes da trajetória
 
         self.v_ref_list = [self.base_lin_speed] * N
-        self.w_ref_list = [self.base_ang_speed] * N
+        self.w_ref_list = [0.0] * N        
 
         # Inicializando as listas relativas à pose
 
@@ -173,17 +173,29 @@ class KlancarCircle(object):
 
         # Gerando os pontos de referência de pose
 
-        for i in range(1, N):
-            self.theta_ref_list[i] = \
-                self.theta_ref_list[i-1] + self.base_ang_speed * self.Ts
+        # Trecho 1
+        for k in range(1, Nl+1):
+            self.x_ref_list[k] = self.x_ref_list[k-1] + self.base_lin_speed * self.Ts
+            self.y_ref_list[k] = self.y_ref_list[k-1]
+            self.theta_ref_list[k] = 0
 
-            self.x_ref_list[i] = \
-                self.x_ref_list[i-1] + self.base_lin_speed * \
-                                       cos(self.theta_ref_list[i]) * self.Ts
+        # Trecho 2
+        for k in range(Nl+1, 2*Nl+1):
+            self.x_ref_list[k] = self.x_ref_list[k-1]
+            self.y_ref_list[k] = self.y_ref_list[k-1] + self.base_lin_speed * self.Ts
+            self.theta_ref_list[k] = pi/2
 
-            self.y_ref_list[i] = \
-                self.y_ref_list[i-1] + self.base_lin_speed * \
-                                       sin(self.theta_ref_list[i]) * self.Ts
+        # Trecho 3
+        for k in range(2*Nl+1, 3*Nl+1):
+            self.x_ref_list[k] = self.x_ref_list[k-1] - self.base_lin_speed * self.Ts
+            self.y_ref_list[k] = self.y_ref_list[k-1]
+            self.theta_ref_list[k] = pi
+
+        # Trecho 4
+        for k in range(3*Nl+1, 4*Nl+1):
+            self.x_ref_list[k] = self.x_ref_list[k-1]
+            self.y_ref_list[k] = self.y_ref_list[k-1] - self.base_lin_speed * self.Ts
+            self.theta_ref_list[k] = 3 * pi/2
 
     #######################################################################################
 
@@ -410,7 +422,7 @@ class KlancarCircle(object):
 
         home = expanduser('~')
         path = home + '/ros_catkin_ws/src/nanook_ufc/controlador_klancar'
-        path += '/circulo/resultados/ensaio_%d.txt' % self.ensaio
+        path += '/quadrado/resultados/ensaio_%d.txt' % self.ensaio
 
         # Abertura do arquivo
 
@@ -418,13 +430,12 @@ class KlancarCircle(object):
 
         # Registro dos parâmetros do ensaio
 
-        params_str  = '### Ensaio do Controlador Klancar com Laser (Círculo) ###\n\n'
+        params_str  = '### Ensaio do Controlador Klancar com Laser (Quadrado) ###\n\n'
         params_str += '# Parâmetros #\n\n'
         params_str += '# Número do Ensaio: %d\n' % self.ensaio
         params_str += '# Frequência: %.1f Hz\n' % self.frequency
-        params_str += '# Raio: %.2f m\n' % self.radius
+        params_str += '# Lado: %.2f m\n' % self.side
         params_str += '# Velocidade Linear da Base: %.2f m/s\n' % self.base_lin_speed
-        params_str += '# Velocidade Angular da Base: %.2f rad/s\n' % self.base_ang_speed
         params_str += '# Parâmetro ksi: %.2f\n' % self.ksi
         params_str += '# Parâmetro w_n: %.2f\n' % self.w_n
         params_str += '# Parâmetro g: %.2f\n\n' % self.g
@@ -487,19 +498,19 @@ if __name__ == '__main__':
 
     # Instanciação do controlador de trajetória
 
-    klancar_circle = KlancarCircle()
+    klancar_square = KlancarSquare()
 
     # Execução do laço principal
 
-    klancar_circle.spin()
+    klancar_square.spin()
 
     # Registro dos dados do ensaio em um arquivo
 
-    klancar_circle.write_file()
+    klancar_square.write_file()
 
     # Finalização
 
-    klancar_circle.finalize()
+    klancar_square.finalize()
 
     print("[INFO] Trajetória concluída.")
 
