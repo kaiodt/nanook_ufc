@@ -185,6 +185,12 @@ class KlancarEight(object):
             self.theta_ref_list[i] = \
                 self.theta_ref_list[i-1] + self.base_ang_speed * self.Ts
 
+            if self.theta_ref_list[i] > pi:
+                self.theta_ref_list[i] -= 2*pi
+
+            if self.theta_ref_list[i] < -pi:
+                self.theta_ref_list[i] += 2*pi
+
             self.x_ref_list[i] = \
                 self.x_ref_list[i-1] + self.base_lin_speed * \
                                        cos(self.theta_ref_list[i]) * self.Ts
@@ -200,6 +206,12 @@ class KlancarEight(object):
             self.theta_ref_list[i] = \
                 self.theta_ref_list[i-1] - self.base_ang_speed * self.Ts
 
+            if self.theta_ref_list[i] > pi:
+                self.theta_ref_list[i] -= 2*pi
+
+            if self.theta_ref_list[i] < -pi:
+                self.theta_ref_list[i] += 2*pi
+                
             self.x_ref_list[i] = \
                 self.x_ref_list[i-1] + self.base_lin_speed * \
                                        cos(self.theta_ref_list[i]) * self.Ts
@@ -234,10 +246,10 @@ class KlancarEight(object):
 
         yaw += self.theta_0
 
-        if yaw > 2 * pi:
-            yaw -= 2 * pi
-        elif yaw < 0:
-            yaw += 2 * pi
+        # if yaw > 2 * pi:
+        #     yaw -= 2 * pi
+        # elif yaw < 0:
+        #     yaw += 2 * pi
 
         # Atualizando a pose
 
