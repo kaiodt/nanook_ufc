@@ -296,8 +296,8 @@ class KlancarEight(object):
         y_error = self.y_ref_list[self.index] - self.y
         theta_error = self.theta_ref_list[self.index] - self.theta
 
-        if theta_error < - pi:
-            theta_error = - theta_error
+        # if theta_error < - pi:
+        #     theta_error = - theta_error
 
         # Atualização das listas de erros
 
