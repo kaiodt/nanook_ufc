@@ -64,7 +64,7 @@ class KlancarSquare(object):
         # Valores máximos de velocidade
 
         self.v_max = rospy.get_param("~v_max", 0.5)
-        self.w_max = rospy.get_param("~w_max", 1.0)
+        self.w_max = rospy.get_param("~w_max", 2.0)
 
         # Pose inicial
 
@@ -195,7 +195,7 @@ class KlancarSquare(object):
         for k in range(3*Nl+1, 4*Nl+1):
             self.x_ref_list[k] = self.x_ref_list[k-1]
             self.y_ref_list[k] = self.y_ref_list[k-1] - self.base_lin_speed * self.Ts
-            self.theta_ref_list[k] = 3 * pi/2
+            self.theta_ref_list[k] = - pi/2
 
     #######################################################################################
 
@@ -223,10 +223,10 @@ class KlancarSquare(object):
 
         yaw += self.theta_0
 
-        if yaw > 2 * pi:
-            yaw -= 2 * pi
-        elif yaw < 0:
-            yaw += 2 * pi
+        # if yaw > 2 * pi:
+        #     yaw -= 2 * pi
+        # elif yaw < 0:
+        #     yaw += 2 * pi
 
         # Atualizando a pose
 
@@ -273,8 +273,10 @@ class KlancarSquare(object):
         y_error = self.y_ref_list[self.index] - self.y
         theta_error = self.theta_ref_list[self.index] - self.theta
 
-        if theta_error < - pi:
-            theta_error = - theta_error
+        # if theta_error < - pi:
+        #     theta_error = - theta_error
+
+        theta_error = atan2(sin(theta_error), cos(theta_error))
 
         # Atualização das listas de erros
 
