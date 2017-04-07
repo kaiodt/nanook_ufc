@@ -73,18 +73,20 @@ class HectorTest(object):
 
         # Normalizando ângulo
 
-        yaw += self.theta_0
+        # yaw += self.theta_0
 
-        if yaw > 2 * pi:
-            yaw -= 2 * pi
-        elif yaw < 0:
-            yaw += 2 * pi
+        # if yaw > 2 * pi:
+        #     yaw -= 2 * pi
+        # elif yaw < 0:
+        #     yaw += 2 * pi
 
         # Atualizando a pose
 
-        self.new_x = pose.pose.position.x + self.x_0    # Posição no eixo x [m]
-        self.new_y = pose.pose.position.y + self.y_0    # Posição no eixo y [m]
-        self.new_theta = yaw                            # Orientação [rad]
+        # self.new_x = pose.pose.position.x + self.x_0    # Posição no eixo x [m]
+        # self.new_y = pose.pose.position.y + self.y_0    # Posição no eixo y [m]
+        self.new_x = pose.pose.position.x    # Posição no eixo x [m]
+        self.new_y = pose.pose.position.y    # Posição no eixo y [m]
+        self.new_theta = yaw                 # Orientação [rad]
 
 
     def spin(self):
