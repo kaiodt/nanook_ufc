@@ -19,7 +19,7 @@ from nav_msgs.msg import Odometry
 from geometry_msgs.msg import PoseStamped, Quaternion, Twist
 from tf.transformations import euler_from_quaternion
 
-from math import sqrt, sin, cos, pi
+from math import sqrt, sin, cos, pi, atan2
 from numpy import sign
 
 from os.path import expanduser
@@ -211,7 +211,7 @@ class KlancarEight(object):
 
             if self.theta_ref_list[i] < -pi:
                 self.theta_ref_list[i] += 2*pi
-                
+
             self.x_ref_list[i] = \
                 self.x_ref_list[i-1] + self.base_lin_speed * \
                                        cos(self.theta_ref_list[i]) * self.Ts
@@ -295,6 +295,8 @@ class KlancarEight(object):
         x_error = self.x_ref_list[self.index] - self.x
         y_error = self.y_ref_list[self.index] - self.y
         theta_error = self.theta_ref_list[self.index] - self.theta
+
+        theta_error = atan2(sin(theta_error), cos(theta_error))
 
         # if theta_error < - pi:
         #     theta_error = - theta_error
