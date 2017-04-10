@@ -8,7 +8,7 @@
 ## Email: kaiodtr@gmail.com
 ###########################################################################################
 ## Arquivo: Nó Controlador de Trajetória de Klancar (Oito)
-## Revisão: 1 [06/04/2017]
+## Revisão: 2 [09/04/2017]
 ###########################################################################################
 ###########################################################################################
 
@@ -19,7 +19,7 @@ from nav_msgs.msg import Odometry
 from geometry_msgs.msg import PoseStamped, Quaternion, Twist
 from tf.transformations import euler_from_quaternion
 
-from math import sqrt, sin, cos, pi, atan2
+from math import sqrt, sin, cos, atan2, pi
 from numpy import sign
 
 from os.path import expanduser
@@ -127,26 +127,26 @@ class KlancarEight(object):
 
         # Pose e velocidade da base
 
-        self.x = self.x_0                # Posição no eixo x [m]
-        self.y = self.y_0                # Posição no eixo y [m]
-        self.theta = self.theta_0        # Orientação [rad]
+        self.x = self.x_0               # Posição no eixo x [m]
+        self.y = self.y_0               # Posição no eixo y [m]
+        self.theta = self.theta_0       # Orientação [rad]
 
-        self.v = 0.0                # Velocidade linear da base [m/s]
-        self.w = 0.0                # Velocidade angular da base [rad/s]
+        self.v = 0.0                    # Velocidade linear da base [m/s]
+        self.w = 0.0                    # Velocidade angular da base [rad/s]
 
         # Nova pose e velocidades da base recebidas (válida na próxima iteração)
 
-        self.new_x = self.x_0            # Posição no eixo x [m]
-        self.new_y = self.y_0            # Posição no eixo y [m]
-        self.new_theta = self.theta_0    # Orientação [rad]
+        self.new_x = self.x_0           # Posição no eixo x [m]
+        self.new_y = self.y_0           # Posição no eixo y [m]
+        self.new_theta = self.theta_0   # Orientação [rad]
 
-        self.new_v = 0.0            # Velocidade linear da base [m/s]
-        self.new_w = 0.0            # Velocidade angular da base [rad/s]
+        self.new_v = 0.0                # Velocidade linear da base [m/s]
+        self.new_w = 0.0                # Velocidade angular da base [rad/s]
 
         # Sinais de controle de velocidades linear e angular a serem enviados para a base
 
-        self.u_v = 0.0              # Comando de velocidade linear da base [m/s]
-        self.u_w = 0.0              # Comando de velocidade angular da base [rad/s]
+        self.u_v = 0.0                  # Comando de velocidade linear da base [m/s]
+        self.u_w = 0.0                  # Comando de velocidade angular da base [rad/s]
 
     #######################################################################################
 
@@ -164,26 +164,26 @@ class KlancarEight(object):
 
         N = 2 * Nc
 
-        # Atualizando as listas com parâmetros constantes da trajetória
-
-        self.v_ref_list = [self.base_lin_speed] * N
-
-        # Inicializando as listas de variáveis
-
-        self.w_ref_list = [0.0] * N
+        # Inicializando as listas de pose e velocidades de referência
 
         self.x_ref_list = [0.0] * N
         self.y_ref_list = [0.0] * N
         self.theta_ref_list = [0.0] * N
 
+        self.v_ref_list = [self.base_lin_speed] * N
+        self.w_ref_list = [self.base_ang_speed] * N
+
         # Gerando os pontos de referência de pose e velocidade angular
 
         # Círculo 1
+
         for i in range(1, Nc+1):
             self.w_ref_list[i] = self.base_ang_speed
 
             self.theta_ref_list[i] = \
                 self.theta_ref_list[i-1] + self.base_ang_speed * self.Ts
+
+            # Manter a referência de orientação no intervalo [-pi, pi]
 
             if self.theta_ref_list[i] > pi:
                 self.theta_ref_list[i] -= 2*pi
@@ -200,11 +200,14 @@ class KlancarEight(object):
                                        sin(self.theta_ref_list[i]) * self.Ts
 
         # Círculo 2
+
         for i in range(Nc+1, N):
             self.w_ref_list[i] = -self.base_ang_speed
 
             self.theta_ref_list[i] = \
                 self.theta_ref_list[i-1] - self.base_ang_speed * self.Ts
+
+            # Manter a referência de orientação no intervalo [-pi, pi]
 
             if self.theta_ref_list[i] > pi:
                 self.theta_ref_list[i] -= 2*pi
@@ -242,20 +245,25 @@ class KlancarEight(object):
                                                    orientation.z,
                                                    orientation.w])
 
-        # Normalizando ângulo
+        # Pose atual estimada pelo laser (Em relação ao frame inicial do robô)
 
-        yaw += self.theta_0
+        x = pose.pose.position.x    # Posição no eixo x [m]
+        y = pose.pose.position.y    # Posição no eixo y [m]
+        theta = yaw                 # Orientação [rad]
 
-        # if yaw > 2 * pi:
-        #     yaw -= 2 * pi
-        # elif yaw < 0:
-        #     yaw += 2 * pi
+        # Atualizando a pose (e transformando para o frame inercial)
 
-        # Atualizando a pose
+        self.new_x = cos(self.theta_0) * x - sin(self.theta_0) * y + self.x_0
+        self.new_y = sin(self.theta_0) * x + cos(self.theta_0) * y + self.y_0
+        self.new_theta = theta + self.theta_0
 
-        self.new_x = pose.pose.position.x + self.x_0    # Posição no eixo x [m]
-        self.new_y = pose.pose.position.y + self.y_0    # Posição no eixo y [m]
-        self.new_theta = yaw                            # Orientação [rad]
+        # Restringindo a orientação no intervalo [-pi, pi]
+
+        if self.new_theta > pi:
+            self.new_theta -= 2*pi
+
+        if self.new_theta < -pi:
+            self.new_theta += 2*pi
 
     #######################################################################################
 
@@ -270,9 +278,7 @@ class KlancarEight(object):
 
         """
 
-        # Convertendo a velocidade para o frame da base (somente no eixo x)
-
-        # v = odometry.twist.twist.linear.x / cos(self.new_theta)
+        # Obtenção da velocidade linear
 
         v = sqrt(pow(odometry.twist.twist.linear.x, 2) + \
                  pow(odometry.twist.twist.linear.y, 2))
@@ -296,10 +302,9 @@ class KlancarEight(object):
         y_error = self.y_ref_list[self.index] - self.y
         theta_error = self.theta_ref_list[self.index] - self.theta
 
-        theta_error = atan2(sin(theta_error), cos(theta_error))
+        # Transformando o erro de orientação para o intervalo [-pi, pi]
 
-        # if theta_error < - pi:
-        #     theta_error = - theta_error
+        theta_error = atan2(sin(theta_error), cos(theta_error))
 
         # Atualização das listas de erros
 
@@ -402,6 +407,10 @@ class KlancarEight(object):
             # Iteração do controle de pose
         
             self.control_pose()
+
+            print("* Sinais de Controle:")
+            print("- u_v = %.5f m/s" % self.u_v)
+            print("- u_w = %.5f rad/s" % self.u_w)
 
             # Publicação das velocidades de referência para o nó controlador de base
 

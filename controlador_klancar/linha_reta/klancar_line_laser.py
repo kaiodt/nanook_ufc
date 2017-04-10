@@ -8,7 +8,7 @@
 ## Email: kaiodtr@gmail.com
 ###########################################################################################
 ## Arquivo: Nó Controlador de Trajetória de Klancar (Linha Reta)
-## Revisão: 1 [31/03/2017]
+## Revisão: 2 [09/04/2017]
 ###########################################################################################
 ###########################################################################################
 
@@ -19,7 +19,7 @@ from nav_msgs.msg import Odometry
 from geometry_msgs.msg import PoseStamped, Quaternion, Twist
 from tf.transformations import euler_from_quaternion
 
-from math import sqrt, sin, cos, pi
+from math import sqrt, sin, cos, atan2, pi
 from numpy import sign
 
 from os.path import expanduser
@@ -57,19 +57,19 @@ class KlancarLine(object):
         # Parâmetros do controlador
 
         self.ksi = rospy.get_param("~ksi", 0.8)
-        self.g = rospy.get_param("~g", 5.0)
+        self.g = rospy.get_param("~g", 20.0)
         self.w_n = rospy.get_param("~w_n", sqrt(self.g * pow(self.base_speed, 2)))
 
         # Valores máximos de velocidade
 
-        self.v_max = rospy.get_param("~v_max", 0.3)
-        self.w_max = rospy.get_param("~w_max", 0.8)
+        self.v_max = rospy.get_param("~v_max", 0.5)
+        self.w_max = rospy.get_param("~w_max", 2.0)
 
         # Pose inicial
 
-        x_0 = rospy.get_param('~x_0', 0.0)          # [m]
-        y_0 = rospy.get_param('~y_0', 0.0)          # [m]
-        theta_0 = rospy.get_param('~theta_0', 0.0)  # [rad]
+        self.x_0 = rospy.get_param('~x_0', 0.0)          # [m]
+        self.y_0 = rospy.get_param('~y_0', 0.0)          # [m]
+        self.theta_0 = rospy.get_param('~theta_0', 0.0)  # [rad]
 
         ### Listas com os dados do ensaio ###
 
@@ -122,26 +122,26 @@ class KlancarLine(object):
 
         # Pose e velocidade da base
 
-        self.x = x_0                # Posição no eixo x [m]
-        self.y = y_0                # Posição no eixo y [m]
-        self.theta = theta_0        # Orientação [rad]
+        self.x = self.x_0               # Posição no eixo x [m]
+        self.y = self.y_0               # Posição no eixo y [m]
+        self.theta = self.theta_0       # Orientação [rad]
 
-        self.v = 0.0                # Velocidade linear da base [m/s]
-        self.w = 0.0                # Velocidade angular da base [rad/s]
+        self.v = 0.0                    # Velocidade linear da base [m/s]
+        self.w = 0.0                    # Velocidade angular da base [rad/s]
 
         # Nova pose e velocidades da base recebidas (válida na próxima iteração)
 
-        self.new_x = x_0            # Posição no eixo x [m]
-        self.new_y = y_0            # Posição no eixo y [m]
-        self.new_theta = theta_0    # Orientação [rad]
+        self.new_x = self.x_0           # Posição no eixo x [m]
+        self.new_y = self.y_0           # Posição no eixo y [m]
+        self.new_theta = self.theta_0   # Orientação [rad]
 
-        self.new_v = 0.0            # Velocidade linear da base [m/s]
-        self.new_w = 0.0            # Velocidade angular da base [rad/s]
+        self.new_v = 0.0                # Velocidade linear da base [m/s]
+        self.new_w = 0.0                # Velocidade angular da base [rad/s]
 
         # Sinais de controle de velocidades linear e angular a serem enviados para a base
 
-        self.u_v = 0.0              # Comando de velocidade linear da base [m/s]
-        self.u_w = 0.0              # Comando de velocidade angular da base [rad/s]
+        self.u_v = 0.0                  # Comando de velocidade linear da base [m/s]
+        self.u_w = 0.0                  # Comando de velocidade angular da base [rad/s]
 
     #######################################################################################
 
@@ -161,18 +161,19 @@ class KlancarLine(object):
 
         N = int(distance / (base_speed * Ts)) + 1
 
-        # Atualizando as listas com parâmetros constantes da trajetória
+        # Inicializando as listas de pose e velocidades de referência
 
+        self.x_ref_list = [0.0] * N             # Posição no eixo x [m]
         self.y_ref_list = [0.0] * N             # Posição no eixo y [m]
         self.theta_ref_list = [0.0] * N         # Orientação [rad]
 
         self.v_ref_list = [base_speed] * N      # Velocidade linear da base [m/s]
         self.w_ref_list = [0.0] * N             # Velocidade angular da base [rad/s]
 
-        # Gerando as referências de posição no eixo x
+        # Gerando os pontos de referência de pose (apenas x varia)
 
-        for i in range(N):
-            self.x_ref_list.append(base_speed * i * Ts)
+        for i in range(1, N):
+            self.x_ref_list[i] = self.x_ref_list[i-1] + base_speed * Ts
 
     #######################################################################################
 
@@ -196,16 +197,25 @@ class KlancarLine(object):
                                                    orientation.z,
                                                    orientation.w])     
 
-        # Normalizando ângulo
+        # Pose atual estimada pelo laser (Em relação ao frame inicial do robô)
 
-        # if yaw < 0:
-        #   yaw += 2 * pi
+        x = pose.pose.position.x    # Posição no eixo x [m]
+        y = pose.pose.position.y    # Posição no eixo y [m]
+        theta = yaw                 # Orientação [rad]
 
-        # Atualizando a pose
+        # Atualizando a pose (e transformando para o frame inercial)
 
-        self.new_x = pose.pose.position.x   # Posição no eixo x [m]
-        self.new_y = pose.pose.position.y   # Posição no eixo y [m]
-        self.new_theta = yaw                # Orientação [rad]
+        self.new_x = cos(self.theta_0) * x - sin(self.theta_0) * y + self.x_0
+        self.new_y = sin(self.theta_0) * x + cos(self.theta_0) * y + self.y_0
+        self.new_theta = theta + self.theta_0
+
+        # Restringindo a orientação no intervalo [-pi, pi]
+
+        if self.new_theta > pi:
+            self.new_theta -= 2*pi
+
+        if self.new_theta < -pi:
+            self.new_theta += 2*pi
 
     #######################################################################################
 
@@ -220,9 +230,10 @@ class KlancarLine(object):
 
         """
 
-        # Convertendo a velocidade para o frame da base (somente no eixo x)
+        # Obtenção da velocidade linear
 
-        v = odometry.twist.twist.linear.x / cos(self.new_theta)
+        v = sqrt(pow(odometry.twist.twist.linear.x, 2) + \
+                 pow(odometry.twist.twist.linear.y, 2))
 
         # Atualizando as velocidades
 
@@ -243,9 +254,10 @@ class KlancarLine(object):
         y_error = self.y_ref_list[self.index] - self.y
         theta_error = self.theta_ref_list[self.index] - self.theta
 
-        if theta_error < - pi:
-            theta_error = - theta_error
-        
+        # Transformando o erro de orientação para o intervalo [-pi, pi]
+
+        theta_error = atan2(sin(theta_error), cos(theta_error))
+
         # Atualização das listas de erros
 
         self.x_error_list.append(x_error)
@@ -348,6 +360,10 @@ class KlancarLine(object):
         
             self.control_pose()
 
+            print("* Sinais de Controle:")
+            print("- u_v = %.5f m/s" % self.u_v)
+            print("- u_w = %.5f rad/s" % self.u_w)
+            
             # Publicação das velocidades de referência para o nó controlador de base
 
             self.publish_speed_refs()
