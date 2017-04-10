@@ -462,8 +462,7 @@ class KlancarSquare(object):
         # Salvando resultados no arquivo
 
         for idx in range(len(self.time_list)):
-            data_file.write('* {0} {1} {2} {3} {4} {5} {6} {7} {8} {9} {10} \
-                               {11} {12} {13} {14} {15} {16}\n'.format(
+            data_file.write('* {0} {1} {2} {3} {4} {5} {6} {7} {8} {9} {10} {11} {12} {13} {14} {15} {16}\n'.format(
                 idx + 1,                        # Amostra
                 self.time_list[idx],            # Tempo [s]
                 self.x_ref_list[idx],           # Referência de posição no eixo x [m]
