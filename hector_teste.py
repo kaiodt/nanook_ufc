@@ -5,7 +5,7 @@ import rospy
 import tf
 
 from nav_msgs.msg import Odometry
-from geometry_msgs.msg import PoseStamped, Quaternion, Twist
+from geometry_msgs.msg import PoseStamped, Pose2D, Quaternion, Twist
 from tf.transformations import euler_from_quaternion
 
 from math import sqrt, sin, cos, pi
@@ -34,6 +34,12 @@ class HectorTest(object):
         self.y_0 = rospy.get_param('~y_0', -0.5)             # [m]
         self.theta_0 = rospy.get_param('~theta_0', pi/2)     # [rad]
 
+        ### Publishers ###
+
+        # Pose inicial
+
+        self.base_pose_pub = rospy.Publisher('set_base_pose', Pose2D, queue_size = 10)
+
         ### Subscribers ###
 
         # Pose via laser (hector_mapping)
@@ -52,7 +58,10 @@ class HectorTest(object):
         self.new_y = self.y_0            # Posição no eixo y [m]
         self.new_theta = self.theta_0    # Orientação [rad]
 
+        ### Publicação da pose inicial da base ###
 
+        self.publish_base_pose(self.x_0, self.y_0, self.theta_0)
+        
     def get_pose(self, pose):
 
         """Callback do tópico 'slam_out_pose'.
