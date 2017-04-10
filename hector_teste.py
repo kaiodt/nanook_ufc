@@ -61,7 +61,31 @@ class HectorTest(object):
         ### Publicação da pose inicial da base ###
 
         self.publish_base_pose(self.x_0, self.y_0, self.theta_0)
-        
+
+
+    def publish_base_pose(self, x, y, theta):
+
+        """Publicação de uma pose para a base no tópico 'set_base_pose'.
+
+        Parâmetros:
+            x (float): Posição no eixo x [m]
+            y (float): Posição no eixo y [m]
+            theta (float): Orientação [rad]
+
+        """
+
+        # Criação da mensagem a ser publicada
+
+        pose = Pose2D()
+        pose.x = x
+        pose.y = y
+        pose.theta = theta
+
+        # Publicação da pose em "set_base_pose"
+
+        self.base_pose_pub.publish(pose)
+
+
     def get_pose(self, pose):
 
         """Callback do tópico 'slam_out_pose'.
