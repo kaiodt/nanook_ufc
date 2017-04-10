@@ -68,7 +68,7 @@ class KlancarEight(object):
         # Valores máximos de velocidade
 
         self.v_max = rospy.get_param("~v_max", 0.5)
-        self.w_max = rospy.get_param("~w_max", 1.0)
+        self.w_max = rospy.get_param("~w_max", 2.0)
 
         # Pose inicial
 
