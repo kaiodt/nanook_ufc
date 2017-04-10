@@ -29,10 +29,10 @@
 		<param name="base_baud_rate" type="int" value="115200" />	
 
 		<!-- Pose inicial -->
-		<param name="x_0" type="double" value="-0.5" />
-		<param name="y_0" type="double" value="-0.5" />
-		<param name="theta_0" type="double" value="$(eval 3.14159265/2)" />
-		<!-- <param name="theta_0" type="double" value="0.0" /> -->
+		<param name="x_0" type="double" value="0.0" />
+		<param name="y_0" type="double" value="0.0" />
+		<!-- <param name="theta_0" type="double" value="$(eval 3.14159265/2)" /> -->
+		<param name="theta_0" type="double" value="0.0" />
 
 		<!-- Nomenclatura dos sistemas de coordenadas -->
 		<param name="base_frame_id" type="string" value="base_link" />

@@ -57,7 +57,7 @@ class KlancarHalfRect(object):
 
         # Parâmetros do controlador
 
-        self.ksi = rospy.get_param("~ksi", 0.6)
+        self.ksi = rospy.get_param("~ksi", 0.8)
         self.g = rospy.get_param("~g", 30.0)
         self.w_n = rospy.get_param("~w_n",
             sqrt(self.g * pow(self.base_lin_speed, 2)))
