@@ -16,7 +16,7 @@ class HectorTest(object):
 
         ### Inicialização do nó ###
 
-        rospy.init_node('klancar_laser_circle')
+        rospy.init_node('hector_test')
 
         # Frequência principal
 
@@ -30,9 +30,9 @@ class HectorTest(object):
 
         # Pose inicial
 
-        self.x_0 = rospy.get_param('~x_0', 0.0)             # [m]
-        self.y_0 = rospy.get_param('~y_0', 0.0)             # [m]
-        self.theta_0 = rospy.get_param('~theta_0', 0.0)     # [rad]
+        self.x_0 = rospy.get_param('~x_0', -0.5)             # [m]
+        self.y_0 = rospy.get_param('~y_0', -0,5)             # [m]
+        self.theta_0 = rospy.get_param('~theta_0', pi/2)     # [rad]
 
         ### Subscribers ###
 
@@ -71,22 +71,25 @@ class HectorTest(object):
                                                    orientation.z,
                                                    orientation.w])
 
-        # Normalizando ângulo
+        # Pose atual estimada pelo laser (Em relação ao frame inicial do robô)
 
-        # yaw += self.theta_0
+        x = pose.pose.position.x    # Posição no eixo x [m]
+        y = pose.pose.position.y    # Posição no eixo y [m]
+        theta = yaw                 # Orientação [rad]
 
-        # if yaw > 2 * pi:
-        #     yaw -= 2 * pi
-        # elif yaw < 0:
-        #     yaw += 2 * pi
+        # Atualizando a pose (e transformando para o frame inercial)
 
-        # Atualizando a pose
+        self.new_x = cos(self.theta_0) * x - sin(self.theta_0) * y + self.x_0
+        self.new_y = sin(self.theta_0) * x + cos(self.theta_0) * y + self.y_0
+        self.new_theta = theta + self.theta_0
 
-        # self.new_x = pose.pose.position.x + self.x_0    # Posição no eixo x [m]
-        # self.new_y = pose.pose.position.y + self.y_0    # Posição no eixo y [m]
-        self.new_x = pose.pose.position.x    # Posição no eixo x [m]
-        self.new_y = pose.pose.position.y    # Posição no eixo y [m]
-        self.new_theta = yaw                 # Orientação [rad]
+        # Restringindo a orientação no intervalo [-pi, pi]
+
+        if self.new_theta > pi:
+            self.new_theta -= 2*pi
+
+        if self.new_theta < -pi:
+            self.new_theta += 2*pi
 
 
     def spin(self):
