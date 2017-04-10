@@ -16,7 +16,7 @@ import rospy
 import tf
 
 from nav_msgs.msg import Odometry
-from geometry_msgs.msg import PoseStamped, Quaternion, Twist
+from geometry_msgs.msg import PoseStamped, Pose2D, Quaternion, Twist
 from tf.transformations import euler_from_quaternion
 
 from math import sqrt, sin, cos, atan2, pi
@@ -109,6 +109,12 @@ class KlancarCircle(object):
 
         self.speed_ref_pub = rospy.Publisher("cmd_vel", Twist, queue_size = 10)
 
+        ### Publishers ###
+
+        # Pose inicial
+
+        self.base_pose_pub = rospy.Publisher('set_base_pose', Pose2D, queue_size = 10)
+
         ### Subscribers ###
 
         # Pose via laser (hector_mapping)
@@ -147,6 +153,10 @@ class KlancarCircle(object):
 
         self.u_v = 0.0                  # Comando de velocidade linear da base [m/s]
         self.u_w = 0.0                  # Comando de velocidade angular da base [rad/s]
+
+        ### Publicação da pose inicial da base ###
+
+        self.publish_base_pose(self.x_0, self.y_0, self.theta_0)
 
     #######################################################################################
 
@@ -190,6 +200,32 @@ class KlancarCircle(object):
             self.y_ref_list[i] = \
                 self.y_ref_list[i-1] + self.base_lin_speed * \
                                        sin(self.theta_ref_list[i]) * self.Ts
+
+    #######################################################################################
+
+    #######################################################################################
+
+    def publish_base_pose(self, x, y, theta):
+
+        """Publicação de uma pose para a base no tópico 'set_base_pose'.
+
+        Parâmetros:
+            x (float): Posição no eixo x [m]
+            y (float): Posição no eixo y [m]
+            theta (float): Orientação [rad]
+
+        """
+
+        # Criação da mensagem a ser publicada
+
+        pose = Pose2D()
+        pose.x = x
+        pose.y = y
+        pose.theta = theta
+
+        # Publicação da pose em "set_base_pose"
+
+        self.base_pose_pub.publish(pose)
 
     #######################################################################################
 

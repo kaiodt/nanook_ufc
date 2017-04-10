@@ -8,7 +8,7 @@
 ## Email: kaiodtr@gmail.com
 ###########################################################################################
 ## Arquivo: Nó Controlador de Base
-## Revisão: 2 [03/03/2017]
+## Revisão: 3 [10/04/2017]
 ###########################################################################################
 ###########################################################################################
 
@@ -16,7 +16,7 @@ import rospy
 import tf
 
 from nav_msgs.msg import Odometry
-from geometry_msgs.msg import Quaternion, Twist
+from geometry_msgs.msg import Quaternion, Twist, Pose2D
 
 from base_driver import NanookBase
 
@@ -114,6 +114,10 @@ class BaseController(object):
 
         rospy.Subscriber('cmd_vel', Twist, self.set_speed_ref)
 
+        # Definição de pose da base
+
+        rospy.Subscriber('set_base_pose', Pose2D, self.set_base_pose)
+
         ### Variáveis ###
 
         # Novas velocidades de referência da base (válidas na próxima iteração)
@@ -156,6 +160,33 @@ class BaseController(object):
         print('* Novas referências recebidas:')
         print('- v =  %f m/s' % self.new_v_ref)
         print('- w =  %f rad/s' % self.new_w_ref)
+
+    #######################################################################################
+
+    #######################################################################################
+
+    def set_base_pose(self, base_pose):
+
+        """Callback do tópico 'set_base_pose'."""
+
+        # Recebimento de uma nova pose para a base tipo Pose2D (x, y, theta).
+
+        # Obtendo a nova pose
+
+        x = base_pose.x             # Posição no eixo x [m]
+        y = base_pose.y             # Posição no eixo y [m]
+        theta = base_pose.theta     # Orientação [rad]
+
+        # Enviando nova pose para a FRDM-K64F
+
+        self.base.set_pose(x, y, theta)
+        rospy.sleep(0.005)
+
+        # Atualizando a pose
+
+        self.x = x
+        self.y = y
+        self.theta = theta_0
 
     #######################################################################################
 
