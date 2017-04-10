@@ -216,6 +216,11 @@ class KlancarHalfRect(object):
         y = pose.pose.position.y    # Posição no eixo y [m]
         theta = yaw                 # Orientação [rad]
 
+        ang_res = 0.36 * pi / 180 
+
+        if (pi - ang_res) < theta < pi or -pi < theta < (-pi + ang_res):
+            theta = pi
+
         # Atualizando a pose (e transformando para o frame inercial)
 
         self.new_x = cos(self.theta_0) * x - sin(self.theta_0) * y + self.x_0
